@@ -78,6 +78,7 @@ var addOns =
         "quickstart",
         "regextester",
         "replacer",
+        "reportingproxy",
         "reports",
         "requester",
         "retest",
