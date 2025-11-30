@@ -19,9 +19,12 @@
  */
 package org.zaproxy.addon.reportingproxy;
 
+import java.util.List;
+
 import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
+import org.parosproxy.paros.network.HttpSender;
 
 /**
  * A headless ZAP extension for the Reporting Proxy.
@@ -40,6 +43,11 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
     // to copy and change this example
     protected static final String PREFIX = "reportingproxy";
 
+    private ReportingListener listener;
+
+    private List<ReportingRule> rules;
+    private RuleLoader ruleLoader = new RuleLoader();
+
     public ExtensionReportingProxy() {
         super(NAME);
         setI18nPrefix(PREFIX);
@@ -48,6 +56,9 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
     @Override
     public void hook(ExtensionHook extensionHook) {
         super.hook(extensionHook);
+
+        this.listener = new ReportingListener();
+        HttpSender.addListener(this.listener);
     }
 
     @Override
@@ -60,6 +71,10 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
     @Override
     public void unload() {
         super.unload();
+
+        if (this.listener != null) {
+            HttpSender.removeListener(this.listener);
+        }
     }
 
     @Override

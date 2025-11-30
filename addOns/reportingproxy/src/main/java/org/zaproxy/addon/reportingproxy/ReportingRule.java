@@ -21,9 +21,7 @@ package org.zaproxy.addon.reportingproxy;
 
 import org.parosproxy.paros.network.HttpMessage;
 
-/**
- * Interface for rules that check HTTP messages for violations.
- */
+/** Interface for rules that check HTTP messages for violations. */
 public interface ReportingRule {
 
     /**

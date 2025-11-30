@@ -66,7 +66,13 @@ public class RateLimitRule implements ReportingRule {
 
         // Check for violation
         if (timestamps.size() > MAX_REQUESTS) {
-            return "Rate limit exceeded for host: " + host + ". More than " + MAX_REQUESTS + " requests in " + (TIME_WINDOW_MS / 1000) + " seconds.";
+            return "Rate limit exceeded for host: "
+                    + host
+                    + ". More than "
+                    + MAX_REQUESTS
+                    + " requests in "
+                    + (TIME_WINDOW_MS / 1000)
+                    + " seconds.";
         }
 
         return null;
