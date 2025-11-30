@@ -46,6 +46,7 @@ public class ExtensionReportingProxy extends ExtensionAdaptor implements HttpSen
 
         // Load default rules
         rules.add(new org.zaproxy.addon.reportingproxy.rules.RateLimitRule());
+        rules.add(new org.zaproxy.addon.reportingproxy.rules.HeaderAnalysisRule());
 
         if (getView() != null) {
             extensionHook.getHookView().addStatusPanel(getReportingProxyPanel());
