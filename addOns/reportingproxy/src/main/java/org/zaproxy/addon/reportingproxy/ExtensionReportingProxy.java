@@ -3,7 +3,7 @@
  *
  * ZAP is an HTTP/HTTPS proxy for assessing web application security.
  *
- * Copyright 2014 The ZAP Development Team
+ * Copyright 2025 The ZAP Development Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,66 +19,92 @@
  */
 package org.zaproxy.addon.reportingproxy;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
+import org.parosproxy.paros.network.HttpMessage;
 import org.parosproxy.paros.network.HttpSender;
+import org.zaproxy.zap.network.HttpSenderListener;
 
-/**
- * A headless ZAP extension for the Reporting Proxy.
- *
- * <p>{@link ExtensionAdaptor} classes are the main entry point for adding/loading functionalities
- * provided by the add-ons.
- *
- * @see #hook(ExtensionHook)
- */
-public class ExtensionReportingProxy extends ExtensionAdaptor {
+public class ExtensionReportingProxy extends ExtensionAdaptor implements HttpSenderListener {
 
-    // The name is public so that other extensions can access it
     public static final String NAME = "ExtensionReportingProxy";
-
-    // The i18n prefix, by default the package name - defined in one place to make it easier
-    // to copy and change this example
-    protected static final String PREFIX = "reportingproxy";
-
-    private ReportingListener listener;
-
-    private List<ReportingRule> rules;
+    private List<ReportingRule> rules = new ArrayList<>();
     private RuleLoader ruleLoader = new RuleLoader();
+    private ReportingProxyPanel panel;
 
     public ExtensionReportingProxy() {
         super(NAME);
-        setI18nPrefix(PREFIX);
+        setI18nPrefix("reportingproxy");
     }
 
     @Override
     public void hook(ExtensionHook extensionHook) {
         super.hook(extensionHook);
+        extensionHook.addHttpSenderListener(this);
 
-        this.listener = new ReportingListener();
-        HttpSender.addListener(this.listener);
+        // Load default rules
+        rules.add(new org.zaproxy.addon.reportingproxy.rules.RateLimitRule());
+
+        if (getView() != null) {
+            extensionHook.getHookView().addStatusPanel(getReportingProxyPanel());
+        }
     }
 
     @Override
     public boolean canUnload() {
-        // The extension can be dynamically unloaded, all resources used/added can be freed/removed
-        // from core.
         return true;
     }
 
     @Override
     public void unload() {
         super.unload();
+    }
 
-        if (this.listener != null) {
-            HttpSender.removeListener(this.listener);
+    @Override
+    public int getListenerOrder() {
+        return 9000; // High order to run late
+    }
+
+    @Override
+    public void onHttpRequestSend(HttpMessage msg, int initiator, HttpSender helper) {
+        for (ReportingRule rule : rules) {
+            try {
+                rule.scan(msg);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
-    public String getDescription() {
-        return Constant.messages.getString(PREFIX + ".desc");
+    public void onHttpResponseReceive(HttpMessage msg, int initiator, HttpSender helper) {
+        for (ReportingRule rule : rules) {
+            try {
+                rule.scan(msg);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void addRule(ReportingRule rule) {
+        this.rules.add(rule);
+    }
+
+    public void clearRules() {
+        this.rules.clear();
+    }
+
+    public RuleLoader getRuleLoader() {
+        return ruleLoader;
+    }
+
+    private ReportingProxyPanel getReportingProxyPanel() {
+        if (panel == null) {
+            panel = new ReportingProxyPanel(this);
+        }
+        return panel;
     }
 }
