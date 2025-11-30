@@ -33,7 +33,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.parosproxy.paros.extension.AbstractPanel;
 import org.parosproxy.paros.view.View;
 
-@SuppressWarnings("serial")
+/**
+ * The panel for the reporting proxy.
+ */
 public class ReportingProxyPanel extends AbstractPanel {
 
     private ExtensionReportingProxy extension;

@@ -21,21 +21,30 @@ package org.zaproxy.addon.reportingproxy;
 
 import org.parosproxy.paros.network.HttpMessage;
 
-/** Interface for rules that check HTTP messages for violations. */
+/**
+ * Interface for a reporting rule. Rules can be stateless (checking a single message) or stateful
+ * (maintaining history).
+ */
 public interface ReportingRule {
+
+    /**
+     * Scans the given message and triggers a notification if the rule is violated.
+     *
+     * @param msg The HTTP message to scan.
+     */
+    void scan(HttpMessage msg);
 
     /**
      * Gets the name of the rule.
      *
-     * @return the name of the rule.
+     * @return The name of the rule.
      */
     String getName();
 
     /**
-     * Checks the given message for violations.
+     * Gets the description of the rule.
      *
-     * @param msg the message to check.
-     * @return a violation string if the rule is broken, or null if the request is safe.
+     * @return The description of the rule.
      */
-    String check(HttpMessage msg);
+    String getDescription();
 }

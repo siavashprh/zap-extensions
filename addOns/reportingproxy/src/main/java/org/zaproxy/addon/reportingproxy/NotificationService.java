@@ -22,7 +22,11 @@ package org.zaproxy.addon.reportingproxy;
 import org.parosproxy.paros.network.HttpMessage;
 import org.parosproxy.paros.view.View;
 
-/** Handles notifications for rule violations. */
+/**
+ * Handles notifications for rule violations.
+ * 
+ * 
+ */
 public class NotificationService {
 
     private static NotificationService instance;

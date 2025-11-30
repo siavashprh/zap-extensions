@@ -1,0 +1,79 @@
+/*
+ * Zed Attack Proxy (ZAP) and its related class files.
+ *
+ * ZAP is an HTTP/HTTPS proxy for assessing web application security.
+ *
+ * Copyright 2025 The ZAP Development Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.zaproxy.addon.reportingproxy;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+
+/** Handles dynamic loading of ReportingRule classes from external JAR files. */
+public class RuleLoader {
+
+    @SuppressWarnings("deprecation")
+    public List<ReportingRule> loadRules(File jarFile)
+            throws IOException,
+                    ClassNotFoundException,
+                    InstantiationException,
+                    IllegalAccessException {
+        List<ReportingRule> rules = new ArrayList<>();
+
+        if (!jarFile.exists() || !jarFile.getName().endsWith(".jar")) {
+            throw new IOException("Invalid JAR file: " + jarFile.getAbsolutePath());
+        }
+
+        URL[] urls = {new URL("jar:file:" + jarFile.getAbsolutePath() + "!/")};
+        try (URLClassLoader cl =
+                URLClassLoader.newInstance(urls, this.getClass().getClassLoader())) {
+            try (JarFile jar = new JarFile(jarFile)) {
+                Enumeration<JarEntry> entries = jar.entries();
+                while (entries.hasMoreElements()) {
+                    JarEntry entry = entries.nextElement();
+                    if (entry.isDirectory() || !entry.getName().endsWith(".class")) {
+                        continue;
+                    }
+
+                    // Convert path to class name
+                    String className =
+                            entry.getName()
+                                    .substring(0, entry.getName().length() - 6)
+                                    .replace('/', '.');
+
+                    try {
+                        Class<?> c = cl.loadClass(className);
+                        if (ReportingRule.class.isAssignableFrom(c) && !c.isInterface()) {
+                            ReportingRule rule = (ReportingRule) c.newInstance();
+                            rules.add(rule);
+                        }
+                    } catch (NoClassDefFoundError | ClassNotFoundException e) {
+                        // Ignore classes that cannot be loaded or are not relevant
+                    }
+                }
+            }
+        }
+
+        return rules;
+    }
+}
