@@ -36,9 +36,12 @@ import org.parosproxy.paros.view.View;
 /**
  * The panel for the reporting proxy.
  */
+@SuppressWarnings("serial")
 public class ReportingProxyPanel extends AbstractPanel {
 
-    private ExtensionReportingProxy extension;
+    private static final long serialVersionUID = 1L;
+
+    private transient ExtensionReportingProxy extension;
     private JLabel statusLabel;
 
     public ReportingProxyPanel(ExtensionReportingProxy extension) {

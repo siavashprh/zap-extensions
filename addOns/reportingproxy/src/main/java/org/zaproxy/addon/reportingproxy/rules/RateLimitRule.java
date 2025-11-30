@@ -28,7 +28,7 @@ import org.zaproxy.addon.reportingproxy.NotificationService;
 import org.zaproxy.addon.reportingproxy.ReportingRule;
 
 /**
- * Rule 1: Detect if the number of requests to a certain domain in a certain timespan exceeds a
+ * Rule: Detect if the number of requests to a certain domain in a certain timespan exceeds a
  * preset threshold.
  */
 public class RateLimitRule implements ReportingRule {
@@ -62,19 +62,21 @@ public class RateLimitRule implements ReportingRule {
 
             // Check threshold
             if (timestamps.size() > THRESHOLD) {
-                NotificationService.getSingleton()
-                        .notify(
-                                this,
-                                msg,
-                                "Rate limit exceeded for "
-                                        + domain
-                                        + ". "
-                                        + timestamps.size()
-                                        + " requests in "
-                                        + (TIME_WINDOW / 1000)
-                                        + "s.");
+                notifyViolation(
+                        msg,
+                        "Rate limit exceeded for "
+                                + domain
+                                + ". "
+                                + timestamps.size()
+                                + " requests in "
+                                + (TIME_WINDOW / 1000)
+                                + "s.");
             }
         }
+    }
+
+    protected void notifyViolation(HttpMessage msg, String details) {
+        NotificationService.getSingleton().notify(this, msg, details);
     }
 
     @Override
