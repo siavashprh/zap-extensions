@@ -21,3 +21,12 @@ dependencies {
     testImplementation(libs.test.junit.jupiter)
     testImplementation(libs.test.mockito.junit.jupiter)
 }
+
+tasks.register<Jar>("packageHeaderAnalysisRule") {
+    archiveClassifier.set("header-analysis-rule")
+    from(sourceSets.main.get().output) {
+        include("org/zaproxy/addon/reportingproxy/rules/HeaderAnalysisRule.class")
+        // Include inner classes if any (like anonymous classes)
+        include("org/zaproxy/addon/reportingproxy/rules/HeaderAnalysisRule$*.class")
+    }
+}
