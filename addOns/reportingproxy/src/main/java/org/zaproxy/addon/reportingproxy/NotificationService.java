@@ -33,11 +33,18 @@ import org.parosproxy.paros.view.View;
  */
 public class NotificationService {
 
+    /** The logger for the notification service. */
     private static final Logger LOGGER = LogManager.getLogger(NotificationService.class);
+    /** The singleton instance of the notification service. */
     private static NotificationService instance;
 
     private NotificationService() {}
 
+    /**
+     * Gets the singleton instance of the notification service.
+     * 
+     * @return The singleton instance of the notification service.
+     */
     public static synchronized NotificationService getSingleton() {
         if (instance == null) {
             instance = new NotificationService();
@@ -45,6 +52,13 @@ public class NotificationService {
         return instance;
     }
 
+    /**
+     * Notifies the user of a rule violation.
+     * 
+     * @param rule The rule that triggered the notification.
+     * @param msg The HTTP message that triggered the notification.
+     * @param details Additional details about the notification.
+     */
     public void notify(ReportingRule rule, HttpMessage msg, String details) {
         if (View.isInitialised()) {
             String notification =

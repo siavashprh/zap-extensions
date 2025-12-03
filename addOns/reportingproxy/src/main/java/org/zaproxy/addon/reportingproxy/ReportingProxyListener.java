@@ -42,16 +42,29 @@ public class ReportingProxyListener implements HttpSenderListener {
         this.controller = controller;
     }
 
+    /**
+     * @return the listener order.
+     */
     @Override
     public int getListenerOrder() {
         return 9000;
     }
 
+    /**
+     * @param msg The HTTP message to scan.
+     * @param initiator The initiator of the message.
+     * @param helper The helper to use for sending the message.
+     */
     @Override
     public void onHttpRequestSend(HttpMessage msg, int initiator, HttpSender helper) {
         controller.scan(msg);
     }
 
+    /**
+     * @param msg The HTTP message to scan.
+     * @param initiator The initiator of the message.
+     * @param helper The helper to use for sending the message.
+     */
     @Override
     public void onHttpResponseReceive(HttpMessage msg, int initiator, HttpSender helper) {
         controller.scan(msg);

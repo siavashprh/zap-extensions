@@ -29,16 +29,26 @@ import org.parosproxy.paros.extension.ExtensionHook;
  */
 public class ExtensionReportingProxy extends ExtensionAdaptor {
 
+    /** The name of the extension. */
     public static final String NAME = "ExtensionReportingProxy";
+    /** The controller for the extension. */
     private ReportingProxyController controller;
+    /** The listener for the extension. */
     private ReportingProxyListener listener;
+    /** The panel for the extension within ZAP UI */
     private ReportingProxyPanel panel;
 
+    /** Constructor for the extension. */
     public ExtensionReportingProxy() {
         super(NAME);
         setI18nPrefix("reportingproxy");
     }
 
+    /**
+     * Hooks the extension into ZAP.
+     * 
+     * @param extensionHook The extension hook to use for adding listeners.
+     */
     @Override
     public void hook(ExtensionHook extensionHook) {
         super.hook(extensionHook);
@@ -60,15 +70,24 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
         }
     }
 
+    /**
+     * @return true if the extension can be unloaded, false otherwise.
+     */
     @Override
     public boolean canUnload() {
         return true;
     }
 
+    /**
+     * @return the controller for the extension.
+     */
     public ReportingProxyController getController() {
         return controller;
     }
 
+    /**
+     * @return the panel for the extension within ZAP UI.
+     */
     private ReportingProxyPanel getReportingProxyPanel() {
         if (panel == null) {
             panel = new ReportingProxyPanel(this);

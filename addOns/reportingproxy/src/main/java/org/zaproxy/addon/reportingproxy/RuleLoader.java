@@ -42,6 +42,16 @@ import java.util.jar.JarFile;
 public class RuleLoader {
 
     @SuppressWarnings("deprecation")
+    /**
+     * Loads rules from a JAR file.
+     * 
+     * @param jarFile The JAR file to load rules from.
+     * @return A list of rules loaded from the JAR file.
+     * @throws IOException If an I/O error occurs.
+     * @throws ClassNotFoundException If a class cannot be found.
+     * @throws InstantiationException If an instance cannot be created.
+     * @throws IllegalAccessException If an instance cannot be accessed.
+     */
     public List<ReportingRule> loadRules(File jarFile)
             throws IOException,
                     ClassNotFoundException,
