@@ -80,9 +80,9 @@ public class ReportingProxyPanel extends AbstractPanel {
 
     private void loadRules(File jarFile) {
         try {
-            java.util.List<ReportingRule> newRules = extension.getRuleLoader().loadRules(jarFile);
+            java.util.List<ReportingRule> newRules = extension.getController().getRuleLoader().loadRules(jarFile);
             for (ReportingRule rule : newRules) {
-                extension.addRule(rule);
+                extension.getController().addRule(rule);
             }
             statusLabel.setText("Loaded " + newRules.size() + " rules from " + jarFile.getName());
             JOptionPane.showMessageDialog(

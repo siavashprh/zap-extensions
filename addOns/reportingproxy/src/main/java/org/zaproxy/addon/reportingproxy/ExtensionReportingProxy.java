@@ -19,19 +19,14 @@
  */
 package org.zaproxy.addon.reportingproxy;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
-import org.parosproxy.paros.network.HttpMessage;
-import org.parosproxy.paros.network.HttpSender;
-import org.zaproxy.zap.network.HttpSenderListener;
 
-public class ExtensionReportingProxy extends ExtensionAdaptor implements HttpSenderListener {
+public class ExtensionReportingProxy extends ExtensionAdaptor {
 
     public static final String NAME = "ExtensionReportingProxy";
-    private List<ReportingRule> rules = new CopyOnWriteArrayList<>();
-    private RuleLoader ruleLoader = new RuleLoader();
+    private ReportingProxyController controller;
+    private ReportingProxyListener listener;
     private ReportingProxyPanel panel;
 
     public ExtensionReportingProxy() {
@@ -42,13 +37,17 @@ public class ExtensionReportingProxy extends ExtensionAdaptor implements HttpSen
     @Override
     public void hook(ExtensionHook extensionHook) {
         super.hook(extensionHook);
-        extensionHook.addHttpSenderListener(this);
+        
+        controller = new ReportingProxyController();
+        listener = new ReportingProxyListener(controller);
+        
+        extensionHook.addHttpSenderListener(listener);
 
         // Load default rules
-        rules.add(new org.zaproxy.addon.reportingproxy.rules.RateLimitRule());
-        rules.add(new org.zaproxy.addon.reportingproxy.rules.HeaderAnalysisRule());
-        rules.add(new org.zaproxy.addon.reportingproxy.rules.CookieSyncRule());
-        rules.add(new org.zaproxy.addon.reportingproxy.rules.CspDetectionRule());
+        controller.addRule(new org.zaproxy.addon.reportingproxy.rules.RateLimitRule());
+        controller.addRule(new org.zaproxy.addon.reportingproxy.rules.HeaderAnalysisRule());
+        controller.addRule(new org.zaproxy.addon.reportingproxy.rules.CookieSyncRule());
+        controller.addRule(new org.zaproxy.addon.reportingproxy.rules.CspDetectionRule());
 
         if (getView() != null) {
             extensionHook.getHookView().addStatusPanel(getReportingProxyPanel());
@@ -60,48 +59,8 @@ public class ExtensionReportingProxy extends ExtensionAdaptor implements HttpSen
         return true;
     }
 
-    @Override
-    public void unload() {
-        super.unload();
-    }
-
-    @Override
-    public int getListenerOrder() {
-        return 9000; // High order to run late
-    }
-
-    @Override
-    public void onHttpRequestSend(HttpMessage msg, int initiator, HttpSender helper) {
-        for (ReportingRule rule : rules) {
-            try {
-                rule.scan(msg);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void onHttpResponseReceive(HttpMessage msg, int initiator, HttpSender helper) {
-        for (ReportingRule rule : rules) {
-            try {
-                rule.scan(msg);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void addRule(ReportingRule rule) {
-        this.rules.add(rule);
-    }
-
-    public void clearRules() {
-        this.rules.clear();
-    }
-
-    public RuleLoader getRuleLoader() {
-        return ruleLoader;
+    public ReportingProxyController getController() {
+        return controller;
     }
 
     private ReportingProxyPanel getReportingProxyPanel() {
