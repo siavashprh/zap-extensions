@@ -54,21 +54,27 @@ class RateLimitRuleTest {
 
     @Test
     void shouldRespectTimeWindow() throws Exception {
-        // Given
         HttpMessage msg = createMessage("example.com");
+        long startTime = 1000000; // Arbitrary start time
+        rule.setCurrentTime(startTime);
 
-        // When: Send 10 requests (at threshold)
         for (int i = 0; i < 10; i++) {
             rule.scan(msg);
         }
-
-        // Simulate time passing (we can't easily mock System.currentTimeMillis without more refactoring,
-        // but for this simple test we assume the rule works if the logic is correct.
-        // To properly test time window, we'd need to inject a Clock.
-        // For now, we verify the basic threshold logic which implies the queue is working.)
         
-        // This test is limited without Clock injection, so we stick to threshold verification
-        assertTrue(rule.notifications.isEmpty());
+        assertTrue(rule.notifications.isEmpty(), "Should be at threshold, no alert yet");
+
+        rule.setCurrentTime(startTime + 11000);
+        
+        rule.scan(msg);
+
+        assertTrue(rule.notifications.isEmpty(), "Should not notify because old requests expired");
+        
+        for (int i = 0; i < 10; i++) {
+            rule.scan(msg);
+        }
+        
+        assertEquals(1, rule.notifications.size(), "Should notify now that threshold is exceeded in new window");
     }
 
     private HttpMessage createMessage(String host) throws Exception {
@@ -77,9 +83,19 @@ class RateLimitRuleTest {
         return msg;
     }
 
-    // Subclass to capture notifications
+    // Subclass to capture notifications and mock time
     private static class TestableRateLimitRule extends RateLimitRule {
         List<String> notifications = new ArrayList<>();
+        long currentTime = System.currentTimeMillis();
+
+        void setCurrentTime(long time) {
+            this.currentTime = time;
+        }
+
+        @Override
+        protected long getCurrentTime() {
+            return currentTime;
+        }
 
         @Override
         protected void notifyViolation(HttpMessage msg, String details) {

@@ -19,8 +19,8 @@
  */
 package org.zaproxy.addon.reportingproxy;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
 import org.parosproxy.paros.network.HttpMessage;
@@ -30,7 +30,7 @@ import org.zaproxy.zap.network.HttpSenderListener;
 public class ExtensionReportingProxy extends ExtensionAdaptor implements HttpSenderListener {
 
     public static final String NAME = "ExtensionReportingProxy";
-    private List<ReportingRule> rules = new ArrayList<>();
+    private List<ReportingRule> rules = new CopyOnWriteArrayList<>();
     private RuleLoader ruleLoader = new RuleLoader();
     private ReportingProxyPanel panel;
 

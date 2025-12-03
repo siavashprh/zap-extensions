@@ -46,7 +46,9 @@ public class NotificationService {
                     String.format(
                             "[Reporting Proxy] Rule '%s' triggered. URL: %s. Details: %s\n",
                             rule.getName(), msg.getRequestHeader().getURI().toString(), details);
-            View.getSingleton().getOutputPanel().append(notification);
+            javax.swing.SwingUtilities.invokeLater(() -> 
+                View.getSingleton().getOutputPanel().append(notification)
+            );
         } else {
             System.out.println("[Reporting Proxy] " + rule.getName() + ": " + details);
         }
