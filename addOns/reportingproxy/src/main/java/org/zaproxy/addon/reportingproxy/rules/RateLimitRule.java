@@ -28,15 +28,13 @@ import org.zaproxy.addon.reportingproxy.NotificationService;
 import org.zaproxy.addon.reportingproxy.ReportingRule;
 
 /**
- * Rule: Detect if the number of requests to a certain domain in a certain timespan exceeds a
- * preset threshold.
+ * Detects if the number of requests to a certain domain exceeds a threshold in a time window.
  */
 public class RateLimitRule implements ReportingRule {
 
-    private static final int THRESHOLD = 10; // requests
-    private static final long TIME_WINDOW = 10000; // 10 seconds in ms
+    private static final int THRESHOLD = 10;
+    private static final long TIME_WINDOW = 10000; // 10 seconds
 
-    // Map of Domain -> Queue of timestamps
     private Map<String, Queue<Long>> requestHistory = new HashMap<>();
 
     @Override
@@ -47,7 +45,7 @@ public class RateLimitRule implements ReportingRule {
             if (domain == null) {
                 return;
             }
-            long now = System.currentTimeMillis();
+            long now = getCurrentTime();
 
             requestHistory.putIfAbsent(domain, new LinkedList<>());
             Queue<Long> timestamps = requestHistory.get(domain);
@@ -77,6 +75,10 @@ public class RateLimitRule implements ReportingRule {
 
     protected void notifyViolation(HttpMessage msg, String details) {
         NotificationService.getSingleton().notify(this, msg, details);
+    }
+
+    protected long getCurrentTime() {
+        return System.currentTimeMillis();
     }
 
     @Override
