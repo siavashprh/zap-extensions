@@ -22,6 +22,11 @@ package org.zaproxy.addon.reportingproxy;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
 
+/**
+ * The extension that provides reporting proxy functionality.
+ * 
+ * @param extensionHook The extension hook to use for adding listeners.
+ */
 public class ExtensionReportingProxy extends ExtensionAdaptor {
 
     public static final String NAME = "ExtensionReportingProxy";

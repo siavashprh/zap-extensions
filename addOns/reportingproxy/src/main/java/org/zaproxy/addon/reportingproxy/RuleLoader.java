@@ -29,7 +29,16 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-/** Handles dynamic loading of ReportingRule classes from external JAR files. */
+/**
+ * Loads rules from a JAR file.
+ * 
+ * @param jarFile The JAR file to load rules from.
+ * @return A list of rules loaded from the JAR file.
+ * @throws IOException If an I/O error occurs.
+ * @throws ClassNotFoundException If a class cannot be found.
+ * @throws InstantiationException If an instance cannot be created.
+ * @throws IllegalAccessException If an instance cannot be accessed.
+ */
 public class RuleLoader {
 
     @SuppressWarnings("deprecation")

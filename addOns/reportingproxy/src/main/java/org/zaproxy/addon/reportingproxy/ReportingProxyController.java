@@ -25,24 +25,51 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.parosproxy.paros.network.HttpMessage;
 
+/**
+ * Controls scanning logic and manages list of rules.
+ *
+ * It receives HTTP messages from the
+ * {@link ReportingProxyListener} and delivers them to each registered {@link ReportingRule}.
+ */
 public class ReportingProxyController {
 
     private static final Logger LOGGER = LogManager.getLogger(ReportingProxyController.class);
     private List<ReportingRule> rules = new CopyOnWriteArrayList<>();
     private RuleLoader ruleLoader = new RuleLoader();
 
+    /**
+     * Adds a new rule to the active set.
+     *
+     * @param rule The rule to add.
+     */
     public void addRule(ReportingRule rule) {
         this.rules.add(rule);
     }
 
+    /**
+     * Clears all active rules.
+     */
     public void clearRules() {
         this.rules.clear();
     }
 
+    /**
+     * Gets the rule loader used for loading rules from JARs.
+     *
+     * @return The {@link RuleLoader}.
+     */
     public RuleLoader getRuleLoader() {
         return ruleLoader;
     }
 
+    /**
+     * Scans the given HTTP message against all active rules.
+     *
+     * If a rule throws an exception during scanning, it is logged, and the scan continues with the
+     * next rule.
+     *
+     * @param msg The HTTP message to scan.
+     */
     public void scan(HttpMessage msg) {
         for (ReportingRule rule : rules) {
             try {
@@ -53,6 +80,11 @@ public class ReportingProxyController {
         }
     }
     
+    /**
+     * Gets the list of active rules.
+     *
+     * @return The list of {@link ReportingRule}s.
+     */
     public List<ReportingRule> getRules() {
         return rules;
     }

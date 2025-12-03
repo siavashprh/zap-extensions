@@ -26,8 +26,10 @@ import org.zaproxy.addon.reportingproxy.NotificationService;
 import org.zaproxy.addon.reportingproxy.ReportingRule;
 
 /**
- * A rule that detects if a Content Security Policy (CSP) is missing from HTML responses.
+ * Detects if a Content Security Policy (CSP) is missing from HTML responses.
  * It checks both the HTTP 'Content-Security-Policy' header and the <meta> tag in the body.
+ * 
+ * @param msg The HTTP message to scan.
  */
 public class CspDetectionRule implements ReportingRule {
 

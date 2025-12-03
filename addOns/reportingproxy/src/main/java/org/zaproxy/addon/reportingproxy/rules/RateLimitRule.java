@@ -29,6 +29,8 @@ import org.zaproxy.addon.reportingproxy.ReportingRule;
 
 /**
  * Detects if the number of requests to a certain domain exceeds a threshold in a time window.
+ * 
+ * @param msg The HTTP message to scan.
  */
 public class RateLimitRule implements ReportingRule {
 

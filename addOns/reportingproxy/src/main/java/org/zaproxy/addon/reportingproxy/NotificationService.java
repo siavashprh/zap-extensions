@@ -27,7 +27,9 @@ import org.parosproxy.paros.view.View;
 /**
  * Handles notifications for rule violations.
  * 
- * 
+ * @param rule The rule that triggered the notification.
+ * @param msg The HTTP message that triggered the notification.
+ * @param details Additional details about the notification.
  */
 public class NotificationService {
 

@@ -32,8 +32,9 @@ import org.zaproxy.addon.reportingproxy.NotificationService;
 import org.zaproxy.addon.reportingproxy.ReportingRule;
 
 /**
- * A rule that detects when common security headers (like HSTS) are missing
- * after being present in previous responses from the same domain.
+ * Detects when common security headers (like HSTS) are missing
+ * 
+ * @param msg The HTTP message to scan.
  */
 public class HeaderAnalysisRule implements ReportingRule {
 

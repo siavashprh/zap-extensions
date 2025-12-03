@@ -41,7 +41,9 @@ import org.parosproxy.paros.extension.AbstractPanel;
 import org.parosproxy.paros.view.View;
 
 /**
- * The panel for the reporting proxy.
+ * Reporting proxy panel.
+ * 
+ * This panel is used to load external rules and display them in a table.
  */
 @SuppressWarnings("serial")
 public class ReportingProxyPanel extends AbstractPanel {
@@ -54,6 +56,11 @@ public class ReportingProxyPanel extends AbstractPanel {
     private JTable rulesTable;
     private DefaultTableModel tableModel;
 
+    /**
+     * Constructs a new ReportingProxyPanel.
+     * 
+     * @param extension The extension that owns this panel.
+     */
     public ReportingProxyPanel(ExtensionReportingProxy extension) {
         super();
         this.extension = extension;
@@ -107,7 +114,7 @@ public class ReportingProxyPanel extends AbstractPanel {
         JScrollPane scrollPane = new JScrollPane(rulesTable);
         this.add(scrollPane, BorderLayout.CENTER);
 
-        // Populate table with default rules (load them after a short delay to ensure controller is initialized)
+        // Populate table with default rules
         javax.swing.SwingUtilities.invokeLater(() -> refreshRulesTable());
     }
 
@@ -124,6 +131,11 @@ public class ReportingProxyPanel extends AbstractPanel {
         }
     }
 
+    /**
+     * Loads rules from a JAR file.
+     * 
+     * @param jarFile The JAR file to load rules from.
+     */
     private void loadRules(File jarFile) {
         try {
             java.util.List<ReportingRule> newRules = extension.getController().getRuleLoader().loadRules(jarFile);

@@ -23,10 +23,21 @@ import org.parosproxy.paros.network.HttpMessage;
 import org.parosproxy.paros.network.HttpSender;
 import org.zaproxy.zap.network.HttpSenderListener;
 
+/**
+ * Listens to all HTTP requests and responses passing through ZAP.
+ *
+ * Intercepting traffic and forwarding it to the {@link ReportingProxyController} for analysis.
+ * It is registered with a high listener order to ensure it sees traffic after other modifications.
+ */
 public class ReportingProxyListener implements HttpSenderListener {
 
     private ReportingProxyController controller;
 
+    /**
+     * Constructs a new listener.
+     *
+     * @param controller The controller to forward messages to.
+     */
     public ReportingProxyListener(ReportingProxyController controller) {
         this.controller = controller;
     }

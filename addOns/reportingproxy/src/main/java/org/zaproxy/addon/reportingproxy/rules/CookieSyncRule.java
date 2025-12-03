@@ -30,8 +30,10 @@ import org.zaproxy.addon.reportingproxy.NotificationService;
 import org.zaproxy.addon.reportingproxy.ReportingRule;
 
 /**
- * A rule that detects if cookie values set in responses are subsequently found in outgoing request
+ * Detects if cookie values set in responses are subsequently found in outgoing request
  * URLs, which may indicate cookie syncing or tracking.
+ * 
+ * @param msg The HTTP message to scan.
  */
 public class CookieSyncRule implements ReportingRule {
 
