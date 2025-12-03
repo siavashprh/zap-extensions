@@ -29,9 +29,23 @@ class RuleLoaderTest {
     }
 
     @Test
-    void shouldThrowExceptionIfFileIsNotJar() throws IOException {
+    void shouldThrowExceptionIfFileIsNotJar() throws Exception {
         File textFile = tempDir.resolve("test.txt").toFile();
         assertTrue(textFile.createNewFile());
         assertThrows(IOException.class, () -> ruleLoader.loadRules(textFile));
+    }
+
+    @Test
+    @SuppressWarnings("try")
+    void shouldReturnEmptyListForEmptyJar() throws Exception {
+        // Create a valid but empty JAR
+        File emptyJar = tempDir.resolve("empty.jar").toFile();
+        try (java.util.jar.JarOutputStream jos = new java.util.jar.JarOutputStream(new java.io.FileOutputStream(emptyJar))) {
+            // No entries, just creating an empty JAR
+            jos.flush();
+        }
+        
+        java.util.List<ReportingRule> rules = ruleLoader.loadRules(emptyJar);
+        assertTrue(rules.isEmpty());
     }
 }

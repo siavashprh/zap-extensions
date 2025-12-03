@@ -20,6 +20,7 @@ dependencies {
     testImplementation(project(":testutils"))
     testImplementation(libs.test.junit.jupiter)
     testImplementation(libs.test.mockito.junit.jupiter)
+    testImplementation("org.mockito:mockito-inline:5.2.0")
 }
 
 tasks.register<Jar>("packageHeaderAnalysisRule") {
