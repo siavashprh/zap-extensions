@@ -19,6 +19,7 @@
  */
 package org.zaproxy.addon.reportingproxy;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -29,7 +30,11 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.parosproxy.paros.extension.AbstractPanel;
@@ -46,13 +51,18 @@ public class ReportingProxyPanel extends AbstractPanel {
 
     private transient ExtensionReportingProxy extension;
     private JLabel statusLabel;
+    private JTable rulesTable;
+    private DefaultTableModel tableModel;
 
     public ReportingProxyPanel(ExtensionReportingProxy extension) {
         super();
         this.extension = extension;
-        this.setLayout(new GridBagLayout());
+        this.setLayout(new BorderLayout());
         this.setName("Reporting Proxy");
 
+        // Create top panel with button and status
+        JPanel topPanel = new JPanel(new GridBagLayout());
+        
         JButton loadButton = new JButton("Load Rules JAR");
         loadButton.addActionListener(
                 new ActionListener() {
@@ -75,10 +85,43 @@ public class ReportingProxyPanel extends AbstractPanel {
         gbc.gridy = 0;
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
-        this.add(loadButton, gbc);
+        topPanel.add(loadButton, gbc);
 
         gbc.gridy = 1;
-        this.add(statusLabel, gbc);
+        topPanel.add(statusLabel, gbc);
+
+        this.add(topPanel, BorderLayout.NORTH);
+
+        // Create table to display active rules
+        String[] columnNames = {"Rule Name", "Description"};
+        tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make table read-only
+            }
+        };
+        rulesTable = new JTable(tableModel);
+        rulesTable.getColumnModel().getColumn(0).setPreferredWidth(200);
+        rulesTable.getColumnModel().getColumn(1).setPreferredWidth(400);
+        
+        JScrollPane scrollPane = new JScrollPane(rulesTable);
+        this.add(scrollPane, BorderLayout.CENTER);
+
+        // Populate table with default rules (load them after a short delay to ensure controller is initialized)
+        javax.swing.SwingUtilities.invokeLater(() -> refreshRulesTable());
+    }
+
+    private void refreshRulesTable() {
+        tableModel.setRowCount(0); // Clear existing rows
+        
+        if (extension.getController() != null) {
+            for (ReportingRule rule : extension.getController().getRules()) {
+                tableModel.addRow(new Object[]{
+                    rule.getName(),
+                    rule.getDescription()
+                });
+            }
+        }
     }
 
     private void loadRules(File jarFile) {
@@ -88,6 +131,10 @@ public class ReportingProxyPanel extends AbstractPanel {
                 extension.getController().addRule(rule);
             }
             statusLabel.setText("Loaded " + newRules.size() + " rules from " + jarFile.getName());
+            
+            // Refresh the table to show new rules
+            refreshRulesTable();
+            
             JOptionPane.showMessageDialog(
                     View.getSingleton().getMainFrame(),
                     "Successfully loaded " + newRules.size() + " rules.",

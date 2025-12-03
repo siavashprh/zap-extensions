@@ -44,7 +44,8 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
         extensionHook.addHttpSenderListener(listener);
 
         // Load default rules
-        controller.addRule(new org.zaproxy.addon.reportingproxy.rules.RateLimitRule());
+        // Commented out for testing JAR loading - uncomment to make it default again
+        // controller.addRule(new org.zaproxy.addon.reportingproxy.rules.RateLimitRule());
         controller.addRule(new org.zaproxy.addon.reportingproxy.rules.HeaderAnalysisRule());
         controller.addRule(new org.zaproxy.addon.reportingproxy.rules.CookieSyncRule());
         controller.addRule(new org.zaproxy.addon.reportingproxy.rules.CspDetectionRule());

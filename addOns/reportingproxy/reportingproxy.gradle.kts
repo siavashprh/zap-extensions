@@ -25,8 +25,49 @@ dependencies {
 tasks.register<Jar>("packageHeaderAnalysisRule") {
     archiveClassifier.set("header-analysis-rule")
     from(sourceSets.main.get().output) {
+        include("org/zaproxy/addon/reportingproxy/ReportingRule.class")
+        include("org/zaproxy/addon/reportingproxy/NotificationService.class")
+        include("org/zaproxy/addon/reportingproxy/NotificationService$*.class")
         include("org/zaproxy/addon/reportingproxy/rules/HeaderAnalysisRule.class")
-        // Include inner classes if any (like anonymous classes)
         include("org/zaproxy/addon/reportingproxy/rules/HeaderAnalysisRule$*.class")
     }
+}
+
+tasks.register<Jar>("packageRateLimitRule") {
+    archiveClassifier.set("rate-limit-rule")
+    from(sourceSets.main.get().output) {
+        include("org/zaproxy/addon/reportingproxy/ReportingRule.class")
+        include("org/zaproxy/addon/reportingproxy/NotificationService.class")
+        include("org/zaproxy/addon/reportingproxy/NotificationService$*.class")
+        include("org/zaproxy/addon/reportingproxy/rules/RateLimitRule.class")
+        include("org/zaproxy/addon/reportingproxy/rules/RateLimitRule$*.class")
+    }
+}
+
+tasks.register<Jar>("packageCookieSyncRule") {
+    archiveClassifier.set("cookie-sync-rule")
+    from(sourceSets.main.get().output) {
+        include("org/zaproxy/addon/reportingproxy/ReportingRule.class")
+        include("org/zaproxy/addon/reportingproxy/NotificationService.class")
+        include("org/zaproxy/addon/reportingproxy/NotificationService$*.class")
+        include("org/zaproxy/addon/reportingproxy/rules/CookieSyncRule.class")
+        include("org/zaproxy/addon/reportingproxy/rules/CookieSyncRule$*.class")
+    }
+}
+
+tasks.register<Jar>("packageCspDetectionRule") {
+    archiveClassifier.set("csp-detection-rule")
+    from(sourceSets.main.get().output) {
+        include("org/zaproxy/addon/reportingproxy/ReportingRule.class")
+        include("org/zaproxy/addon/reportingproxy/NotificationService.class")
+        include("org/zaproxy/addon/reportingproxy/NotificationService$*.class")
+        include("org/zaproxy/addon/reportingproxy/rules/CspDetectionRule.class")
+        include("org/zaproxy/addon/reportingproxy/rules/CspDetectionRule$*.class")
+    }
+}
+
+tasks.register("packageAllRules") {
+    dependsOn("packageHeaderAnalysisRule", "packageRateLimitRule", "packageCookieSyncRule", "packageCspDetectionRule")
+    group = "build"
+    description = "Packages all reporting rules as individual JAR files"
 }
