@@ -19,6 +19,8 @@
  */
 package org.zaproxy.addon.reportingproxy;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.parosproxy.paros.network.HttpMessage;
 import org.parosproxy.paros.view.View;
 
@@ -29,6 +31,7 @@ import org.parosproxy.paros.view.View;
  */
 public class NotificationService {
 
+    private static final Logger LOGGER = LogManager.getLogger(NotificationService.class);
     private static NotificationService instance;
 
     private NotificationService() {}
@@ -50,7 +53,7 @@ public class NotificationService {
                 View.getSingleton().getOutputPanel().append(notification)
             );
         } else {
-            System.out.println("[Reporting Proxy] " + rule.getName() + ": " + details);
+            LOGGER.info("[Reporting Proxy] Rule '{}' triggered: {}", rule.getName(), details);
         }
     }
 }

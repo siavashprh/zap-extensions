@@ -30,6 +30,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.parosproxy.paros.extension.AbstractPanel;
 import org.parosproxy.paros.view.View;
 
@@ -40,6 +42,7 @@ import org.parosproxy.paros.view.View;
 public class ReportingProxyPanel extends AbstractPanel {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LogManager.getLogger(ReportingProxyPanel.class);
 
     private transient ExtensionReportingProxy extension;
     private JLabel statusLabel;
@@ -91,7 +94,7 @@ public class ReportingProxyPanel extends AbstractPanel {
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error loading rules from JAR {}: {}", jarFile.getName(), e.getMessage(), e);
             JOptionPane.showMessageDialog(
                     View.getSingleton().getMainFrame(),
                     "Error loading rules: " + e.getMessage(),

@@ -21,10 +21,13 @@ package org.zaproxy.addon.reportingproxy;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.parosproxy.paros.network.HttpMessage;
 
 public class ReportingProxyController {
 
+    private static final Logger LOGGER = LogManager.getLogger(ReportingProxyController.class);
     private List<ReportingRule> rules = new CopyOnWriteArrayList<>();
     private RuleLoader ruleLoader = new RuleLoader();
 
@@ -45,7 +48,7 @@ public class ReportingProxyController {
             try {
                 rule.scan(msg);
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Error scanning message with rule {}: {}", rule.getName(), e.getMessage(), e);
             }
         }
     }
