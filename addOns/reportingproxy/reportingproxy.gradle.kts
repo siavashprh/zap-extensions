@@ -23,6 +23,18 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 }
 
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
 tasks.register<Jar>("packageHeaderAnalysisRule") {
     archiveClassifier.set("header-analysis-rule")
     from(sourceSets.main.get().output) {

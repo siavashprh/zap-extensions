@@ -6,6 +6,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,9 @@ class ReportingProxyControllerTest {
         controller = new ReportingProxyController();
         mockRule1 = mock(ReportingRule.class);
         mockRule2 = mock(ReportingRule.class);
+        
+        when(mockRule1.getName()).thenReturn("Rule1");
+        when(mockRule2.getName()).thenReturn("Rule2");
     }
 
     @Test
@@ -63,5 +67,17 @@ class ReportingProxyControllerTest {
 
         // Verify rule 2 still ran
         verify(mockRule2, times(1)).scan(msg);
+    }
+
+    @Test
+    void shouldNotAddDuplicateRule() {
+        when(mockRule1.getName()).thenReturn("Rule1");
+        when(mockRule2.getName()).thenReturn("Rule1"); // Same name
+
+        controller.addRule(mockRule1);
+        controller.addRule(mockRule2);
+
+        assertEquals(1, controller.getRules().size());
+        assertTrue(controller.getRules().contains(mockRule1));
     }
 }

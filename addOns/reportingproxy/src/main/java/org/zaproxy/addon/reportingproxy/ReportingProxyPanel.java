@@ -66,6 +66,7 @@ public class ReportingProxyPanel extends AbstractPanel {
         this.extension = extension;
         this.setLayout(new BorderLayout());
         this.setName("Reporting Proxy");
+        this.setIcon(new javax.swing.ImageIcon(ReportingProxyPanel.class.getResource("/org/zaproxy/addon/reportingproxy/resources/icon.png")));
 
         // Create top panel with button and status
         JPanel topPanel = new JPanel(new GridBagLayout());

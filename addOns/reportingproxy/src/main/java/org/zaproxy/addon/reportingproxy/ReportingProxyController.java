@@ -39,10 +39,16 @@ public class ReportingProxyController {
 
     /**
      * Adds a new rule to the active set.
-     *
+     * 
      * @param rule The rule to add.
      */
     public void addRule(ReportingRule rule) {
+        for (ReportingRule existingRule : rules) {
+            if (existingRule.getName().equals(rule.getName())) {
+                LOGGER.warn("Rule with name '{}' already exists. Skipping addition.", rule.getName());
+                return;
+            }
+        }
         this.rules.add(rule);
     }
 
