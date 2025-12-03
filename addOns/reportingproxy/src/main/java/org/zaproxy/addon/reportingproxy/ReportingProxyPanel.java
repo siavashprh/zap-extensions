@@ -39,6 +39,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.parosproxy.paros.extension.AbstractPanel;
 import org.parosproxy.paros.view.View;
+import org.zaproxy.zap.utils.DisplayUtils;
 
 /**
  * Reporting proxy panel.
@@ -66,7 +67,7 @@ public class ReportingProxyPanel extends AbstractPanel {
         this.extension = extension;
         this.setLayout(new BorderLayout());
         this.setName("Reporting Proxy");
-        this.setIcon(new javax.swing.ImageIcon(ReportingProxyPanel.class.getResource("/org/zaproxy/addon/reportingproxy/resources/icon.png")));
+        this.setIcon(DisplayUtils.getScaledIcon(ReportingProxyPanel.class.getResource("/org/zaproxy/addon/reportingproxy/resources/icon.png")));
 
         // Create top panel with button and status
         JPanel topPanel = new JPanel(new GridBagLayout());
@@ -95,6 +96,13 @@ public class ReportingProxyPanel extends AbstractPanel {
         gbc.anchor = GridBagConstraints.WEST;
         topPanel.add(loadButton, gbc);
 
+        JButton removeButton = new JButton("Remove Rule");
+        removeButton.setEnabled(false); // Disabled until row selected
+        removeButton.addActionListener(e -> removeSelectedRule());
+        
+        gbc.gridx = 1;
+        topPanel.add(removeButton, gbc);
+
         gbc.gridy = 1;
         topPanel.add(statusLabel, gbc);
 
@@ -111,6 +119,13 @@ public class ReportingProxyPanel extends AbstractPanel {
         rulesTable = new JTable(tableModel);
         rulesTable.getColumnModel().getColumn(0).setPreferredWidth(200);
         rulesTable.getColumnModel().getColumn(1).setPreferredWidth(400);
+        
+        // Enable/disable remove button based on selection
+        rulesTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                removeButton.setEnabled(rulesTable.getSelectedRow() != -1);
+            }
+        });
         
         JScrollPane scrollPane = new JScrollPane(rulesTable);
         this.add(scrollPane, BorderLayout.CENTER);
@@ -160,6 +175,28 @@ public class ReportingProxyPanel extends AbstractPanel {
                     "Error loading rules: " + e.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void removeSelectedRule() {
+        int selectedRow = rulesTable.getSelectedRow();
+        if (selectedRow != -1) {
+            String ruleName = (String) tableModel.getValueAt(selectedRow, 0);
+            
+            // Find the rule object
+            ReportingRule ruleToRemove = null;
+            for (ReportingRule rule : extension.getController().getRules()) {
+                if (rule.getName().equals(ruleName)) {
+                    ruleToRemove = rule;
+                    break;
+                }
+            }
+            
+            if (ruleToRemove != null) {
+                extension.getController().removeRule(ruleToRemove);
+                refreshRulesTable();
+                statusLabel.setText("Removed rule: " + ruleName);
+            }
         }
     }
 }

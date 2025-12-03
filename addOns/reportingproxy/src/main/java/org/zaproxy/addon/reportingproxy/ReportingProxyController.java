@@ -53,6 +53,15 @@ public class ReportingProxyController {
     }
 
     /**
+     * Removes a rule from the active set.
+     * 
+     * @param rule The rule to remove.
+     */
+    public void removeRule(ReportingRule rule) {
+        this.rules.remove(rule);
+    }
+
+    /**
      * Clears all active rules.
      */
     public void clearRules() {
