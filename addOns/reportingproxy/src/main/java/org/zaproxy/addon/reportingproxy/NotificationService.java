@@ -55,21 +55,36 @@ public class NotificationService {
     /**
      * Notifies the user of a rule violation.
      * 
+     * Shows both a pop-up notification window and logs to the output panel.
+     * 
      * @param rule The rule that triggered the notification.
      * @param msg The HTTP message that triggered the notification.
      * @param details Additional details about the notification.
      */
     public void notify(ReportingRule rule, HttpMessage msg, String details) {
+        String url = "Unknown URL";
+        try {
+            if (msg != null && msg.getRequestHeader() != null && msg.getRequestHeader().getURI() != null) {
+                url = msg.getRequestHeader().getURI().toString();
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Error getting URL from message: {}", e.getMessage());
+        }
+        
         if (View.isInitialised()) {
+            NotificationManager notificationManager = NotificationManager.getInstance();
+            notificationManager.showNotification(rule.getName(), url, details);
+            
             String notification =
                     String.format(
                             "[Reporting Proxy] Rule '%s' triggered. URL: %s. Details: %s\n",
-                            rule.getName(), msg.getRequestHeader().getURI().toString(), details);
+                            rule.getName(), url, details);
             javax.swing.SwingUtilities.invokeLater(() -> 
                 View.getSingleton().getOutputPanel().append(notification)
             );
         } else {
-            LOGGER.info("[Reporting Proxy] Rule '{}' triggered: {}", rule.getName(), details);
+            LOGGER.info("[Reporting Proxy] Rule '{}' triggered. URL: {}. Details: {}", 
+                    rule.getName(), url, details);
         }
     }
 }
