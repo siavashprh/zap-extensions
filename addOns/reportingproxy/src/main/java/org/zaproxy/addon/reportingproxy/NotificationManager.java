@@ -39,12 +39,14 @@ public class NotificationManager {
     
     private static NotificationManager instance;
     private final List<NotificationWindow> activeNotifications;
+    private final List<NotificationHistoryEntry> notificationHistory;
     
     /**
      * Private constructor for singleton pattern.
      */
     private NotificationManager() {
         activeNotifications = new ArrayList<>();
+        notificationHistory = new ArrayList<>();
     }
     
     /**
@@ -67,6 +69,9 @@ public class NotificationManager {
      * @param details Additional details about the violation.
      */
     public void showNotification(String ruleName, String url, String details) {
+        // Add to history
+        notificationHistory.add(new NotificationHistoryEntry(ruleName, url, details));
+        
         if (!View.isInitialised()) {
             LOGGER.debug("View not initialized, skipping pop-up notification");
             return;
@@ -161,5 +166,30 @@ public class NotificationManager {
     public int getActiveNotificationCount() {
         cleanupDisposedNotifications();
         return activeNotifications.size();
+    }
+    
+    /**
+     * Gets the notification history.
+     * 
+     * @return A copy of the notification history list.
+     */
+    public List<NotificationHistoryEntry> getNotificationHistory() {
+        return new ArrayList<>(notificationHistory);
+    }
+    
+    /**
+     * Clears the notification history.
+     */
+    public void clearHistory() {
+        notificationHistory.clear();
+    }
+    
+    /**
+     * Gets the number of notifications in history.
+     * 
+     * @return The count of notifications in history.
+     */
+    public int getHistoryCount() {
+        return notificationHistory.size();
     }
 }

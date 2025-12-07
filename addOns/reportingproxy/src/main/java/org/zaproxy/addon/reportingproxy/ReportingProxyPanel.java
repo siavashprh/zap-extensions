@@ -102,9 +102,30 @@ public class ReportingProxyPanel extends AbstractPanel {
         
         gbc.gridx = 1;
         topPanel.add(removeButton, gbc);
+        
+        JButton historyButton = new JButton("View Notification History");
+        historyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NotificationManager manager = NotificationManager.getInstance();
+                NotificationHistoryDialog dialog = new NotificationHistoryDialog(
+                    View.getSingleton().getMainFrame(), 
+                    manager
+                );
+                dialog.setVisible(true);
+            }
+        });
+        
+        gbc.gridx = 2;
+        topPanel.add(historyButton, gbc);
 
+        gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.gridwidth = 3;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         topPanel.add(statusLabel, gbc);
+        
+        gbc.gridwidth = 1;
 
         this.add(topPanel, BorderLayout.NORTH);
 
