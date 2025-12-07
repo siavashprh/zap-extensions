@@ -1,10 +1,15 @@
+import org.zaproxy.gradle.addon.AddOnPlugin
+
 description = "ReportingProxy extension"
+
+val rulesJarDir = layout.buildDirectory.dir("zapAddOn/rules/")
 
 zapAddOn {
     addOnName.set("ReportingProxy")
 
     manifest {
         author.set("Group 8")
+        files.from(rulesJarDir)
     }
 }
 
@@ -36,7 +41,10 @@ tasks.jacocoTestReport {
 }
 
 tasks.register<Jar>("packageHeaderAnalysisRule") {
-    archiveClassifier.set("header-analysis-rule")
+    archiveBaseName.set("header-analysis-rule")
+    archiveClassifier.set("")
+    destinationDirectory.set(rulesJarDir.get().asFile)
+    dependsOn(tasks.named("compileJava"))
     from(sourceSets.main.get().output) {
         include("org/zaproxy/addon/reportingproxy/ReportingRule.class")
         include("org/zaproxy/addon/reportingproxy/NotificationService.class")
@@ -47,7 +55,10 @@ tasks.register<Jar>("packageHeaderAnalysisRule") {
 }
 
 tasks.register<Jar>("packageRateLimitRule") {
-    archiveClassifier.set("rate-limit-rule")
+    archiveBaseName.set("rate-limit-rule")
+    archiveClassifier.set("")
+    destinationDirectory.set(rulesJarDir.get().asFile)
+    dependsOn(tasks.named("compileJava"))
     from(sourceSets.main.get().output) {
         include("org/zaproxy/addon/reportingproxy/ReportingRule.class")
         include("org/zaproxy/addon/reportingproxy/NotificationService.class")
@@ -58,7 +69,10 @@ tasks.register<Jar>("packageRateLimitRule") {
 }
 
 tasks.register<Jar>("packageCookieSyncRule") {
-    archiveClassifier.set("cookie-sync-rule")
+    archiveBaseName.set("cookie-sync-rule")
+    archiveClassifier.set("")
+    destinationDirectory.set(rulesJarDir.get().asFile)
+    dependsOn(tasks.named("compileJava"))
     from(sourceSets.main.get().output) {
         include("org/zaproxy/addon/reportingproxy/ReportingRule.class")
         include("org/zaproxy/addon/reportingproxy/NotificationService.class")
@@ -69,7 +83,10 @@ tasks.register<Jar>("packageCookieSyncRule") {
 }
 
 tasks.register<Jar>("packageCspDetectionRule") {
-    archiveClassifier.set("csp-detection-rule")
+    archiveBaseName.set("csp-detection-rule")
+    archiveClassifier.set("")
+    destinationDirectory.set(rulesJarDir.get().asFile)
+    dependsOn(tasks.named("compileJava"))
     from(sourceSets.main.get().output) {
         include("org/zaproxy/addon/reportingproxy/ReportingRule.class")
         include("org/zaproxy/addon/reportingproxy/NotificationService.class")
@@ -83,4 +100,8 @@ tasks.register("packageAllRules") {
     dependsOn("packageHeaderAnalysisRule", "packageRateLimitRule", "packageCookieSyncRule", "packageCspDetectionRule")
     group = "build"
     description = "Packages all reporting rules as individual JAR files"
+}
+
+tasks.named(AddOnPlugin.GENERATE_MANIFEST_TASK_NAME) {
+    dependsOn("packageAllRules")
 }
