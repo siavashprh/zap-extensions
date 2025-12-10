@@ -19,7 +19,11 @@
  */
 package org.zaproxy.addon.reportingproxy;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -116,7 +120,9 @@ public class ReportingProxyController {
                         "Content-Length: 0\r\n");
                 msg.setResponseBody("{\"error\": \"Blocked by Filtering Proxy\", \"reason\": \"" + e.getDetails() + "\"}");
             } else {
-                String html = "<html><body><h1>Request Blocked</h1><p>" + e.getDetails() + "</p></body></html>";
+                String html = loadBlockedHtmlTemplate();
+                html = html.replace("{{DETAILS}}", e.getDetails());
+                
                 msg.setResponseHeader(
                         "HTTP/1.1 200 OK\r\n" +
                         "Content-Type: text/html\r\n" +
@@ -128,6 +134,20 @@ public class ReportingProxyController {
             
         } catch (Exception ex) {
             LOGGER.error("Error handling blocking response", ex);
+        }
+    }
+
+    private String loadBlockedHtmlTemplate() {
+        try (InputStream is = getClass().getResourceAsStream("resources/blocked.html")) {
+            if (is == null) {
+                return "<html><body><h1>Request Blocked</h1><p>{{DETAILS}}</p></body></html>";
+            }
+            try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
+                return scanner.useDelimiter("\\A").next();
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error loading blocked.html template", e);
+            return "<html><body><h1>Request Blocked</h1><p>{{DETAILS}}</p></body></html>";
         }
     }
     
