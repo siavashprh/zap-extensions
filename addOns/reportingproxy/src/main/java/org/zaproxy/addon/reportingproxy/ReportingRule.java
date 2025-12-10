@@ -47,4 +47,38 @@ public interface ReportingRule {
      * @return The description of the rule.
      */
     String getDescription();
+
+    /**
+     * Checks if the rule is currently set to blocking mode.
+     *
+     * @return true if the rule is blocking, false otherwise.
+     */
+    default boolean isBlocking() {
+        return false;
+    }
+
+    /**
+     * Sets the blocking mode for the rule.
+     *
+     * @param blocking true to enable blocking, false to disable.
+     */
+    default void setBlocking(boolean blocking) {
+        // Default implementation does nothing
+    }
+
+    /**
+     * Gets the number of times this rule has blocked a request.
+     *
+     * @return The number of blocked requests.
+     */
+    default int getBlockedCount() {
+        return 0;
+    }
+
+    /**
+     * Increments the blocked count.
+     */
+    default void incrementBlockedCount() {
+        // Default implementation does nothing
+    }
 }
