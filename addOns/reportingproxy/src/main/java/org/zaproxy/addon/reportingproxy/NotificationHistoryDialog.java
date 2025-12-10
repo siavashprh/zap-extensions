@@ -20,7 +20,6 @@
 package org.zaproxy.addon.reportingproxy;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

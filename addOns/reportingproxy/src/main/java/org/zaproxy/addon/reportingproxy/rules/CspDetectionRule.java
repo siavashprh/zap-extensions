@@ -22,6 +22,7 @@ package org.zaproxy.addon.reportingproxy.rules;
 import java.util.List;
 import org.parosproxy.paros.network.HttpHeader;
 import org.parosproxy.paros.network.HttpMessage;
+import org.zaproxy.addon.reportingproxy.AbstractReportingRule;
 import org.zaproxy.addon.reportingproxy.NotificationService;
 import org.zaproxy.addon.reportingproxy.ReportingRule;
 
@@ -31,7 +32,7 @@ import org.zaproxy.addon.reportingproxy.ReportingRule;
  * 
  * @param msg The HTTP message to scan.
  */
-public class CspDetectionRule implements ReportingRule {
+public class CspDetectionRule extends AbstractReportingRule {
 
     @Override
     public void scan(HttpMessage msg) {
