@@ -130,18 +130,42 @@ public class ReportingProxyPanel extends AbstractPanel {
         this.add(topPanel, BorderLayout.NORTH);
 
         // Create table to display active rules
-        String[] columnNames = {"Rule Name", "Description"};
+        String[] columnNames = {"Rule Name", "Description", "Blocking", "Blocked Count"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make table read-only
+                return column == 2; 
+            }
+            
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 2) {
+                    return Boolean.class;
+                }
+                return super.getColumnClass(columnIndex);
             }
         };
         rulesTable = new JTable(tableModel);
         rulesTable.getColumnModel().getColumn(0).setPreferredWidth(200);
         rulesTable.getColumnModel().getColumn(1).setPreferredWidth(400);
+        rulesTable.getColumnModel().getColumn(2).setPreferredWidth(80);
+        rulesTable.getColumnModel().getColumn(3).setPreferredWidth(100);
         
-        // Enable/disable remove button based on selection
+        tableModel.addTableModelListener(e -> {
+            if (e.getType() == javax.swing.event.TableModelEvent.UPDATE && e.getColumn() == 2) {
+                int row = e.getFirstRow();
+                boolean isBlocking = (Boolean) tableModel.getValueAt(row, 2);
+                String ruleName = (String) tableModel.getValueAt(row, 0);
+                
+                for (ReportingRule rule : extension.getController().getRules()) {
+                    if (rule.getName().equals(ruleName)) {
+                        rule.setBlocking(isBlocking);
+                        break;
+                    }
+                }
+            }
+        });
+        
         rulesTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 removeButton.setEnabled(rulesTable.getSelectedRow() != -1);
@@ -151,18 +175,19 @@ public class ReportingProxyPanel extends AbstractPanel {
         JScrollPane scrollPane = new JScrollPane(rulesTable);
         this.add(scrollPane, BorderLayout.CENTER);
 
-        // Populate table with default rules
         javax.swing.SwingUtilities.invokeLater(() -> refreshRulesTable());
     }
 
     private void refreshRulesTable() {
-        tableModel.setRowCount(0); // Clear existing rows
+        tableModel.setRowCount(0); 
         
         if (extension.getController() != null) {
             for (ReportingRule rule : extension.getController().getRules()) {
                 tableModel.addRow(new Object[]{
                     rule.getName(),
-                    rule.getDescription()
+                    rule.getDescription(),
+                    rule.isBlocking(),
+                    rule.getBlockedCount()
                 });
             }
         }

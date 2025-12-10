@@ -56,6 +56,7 @@ public class NotificationService {
      * Notifies the user of a rule violation.
      * 
      * Shows both a pop-up notification window and logs to the output panel.
+     * If the rule is blocking, it throws a BlockingViolationException.
      * 
      * @param rule The rule that triggered the notification.
      * @param msg The HTTP message that triggered the notification.
@@ -73,18 +74,26 @@ public class NotificationService {
         
         if (View.isInitialised()) {
             NotificationManager notificationManager = NotificationManager.getInstance();
-            notificationManager.showNotification(rule.getName(), url, details);
+            String displayDetails = details;
+            if (rule.isBlocking()) {
+                displayDetails = "[BLOCKED] " + details;
+            }
+            notificationManager.showNotification(rule.getName(), url, displayDetails);
             
             String notification =
                     String.format(
                             "[Reporting Proxy] Rule '%s' triggered. URL: %s. Details: %s\n",
-                            rule.getName(), url, details);
+                            rule.getName(), url, displayDetails);
             javax.swing.SwingUtilities.invokeLater(() -> 
                 View.getSingleton().getOutputPanel().append(notification)
             );
         } else {
             LOGGER.info("[Reporting Proxy] Rule '{}' triggered. URL: {}. Details: {}", 
                     rule.getName(), url, details);
+        }
+
+        if (rule.isBlocking()) {
+            throw new BlockingViolationException(rule, details);
         }
     }
 }

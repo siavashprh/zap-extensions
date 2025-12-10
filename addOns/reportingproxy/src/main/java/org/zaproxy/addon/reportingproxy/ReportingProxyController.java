@@ -89,9 +89,45 @@ public class ReportingProxyController {
         for (ReportingRule rule : rules) {
             try {
                 rule.scan(msg);
+            } catch (BlockingViolationException e) {
+                LOGGER.info("Blocking violation detected: {}", e.getDetails());
+                handleBlocking(msg, e);
+                break;
             } catch (Exception e) {
                 LOGGER.error("Error scanning message with rule {}: {}", rule.getName(), e.getMessage(), e);
             }
+        }
+    }
+
+    private void handleBlocking(HttpMessage msg, BlockingViolationException e) {
+        try {
+            e.getRule().incrementBlockedCount();
+
+            boolean isJson = false;
+            String contentType = msg.getRequestHeader().getHeader("Content-Type");
+            if (contentType != null && contentType.contains("application/json")) {
+                isJson = true;
+            }
+            
+            if (isJson) {
+                msg.setResponseHeader(
+                        "HTTP/1.1 429 Too Many Requests\r\n" +
+                        "Content-Type: application/json\r\n" +
+                        "Content-Length: 0\r\n");
+                msg.setResponseBody("{\"error\": \"Blocked by Filtering Proxy\", \"reason\": \"" + e.getDetails() + "\"}");
+            } else {
+                String html = "<html><body><h1>Request Blocked</h1><p>" + e.getDetails() + "</p></body></html>";
+                msg.setResponseHeader(
+                        "HTTP/1.1 200 OK\r\n" +
+                        "Content-Type: text/html\r\n" +
+                        "Content-Length: " + html.length() + "\r\n");
+                msg.setResponseBody(html);
+            }
+            
+            msg.getResponseHeader().setContentLength(msg.getResponseBody().length());
+            
+        } catch (Exception ex) {
+            LOGGER.error("Error handling blocking response", ex);
         }
     }
     
