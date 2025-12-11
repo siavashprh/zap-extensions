@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zaproxy.addon.reportingproxy;
+package org.zaproxy.addon.reportingproxy.ui;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;

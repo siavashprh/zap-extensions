@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
+import org.zaproxy.addon.reportingproxy.ui.ReportingProxyPanel;
 
 /**
  * The extension that provides reporting proxy functionality.

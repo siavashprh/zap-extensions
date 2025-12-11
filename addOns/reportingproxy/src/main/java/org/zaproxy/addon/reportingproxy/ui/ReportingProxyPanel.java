@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zaproxy.addon.reportingproxy;
+package org.zaproxy.addon.reportingproxy.ui;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -39,6 +39,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.parosproxy.paros.extension.AbstractPanel;
 import org.parosproxy.paros.view.View;
+import org.zaproxy.addon.reportingproxy.ExtensionReportingProxy;
+import org.zaproxy.addon.reportingproxy.ReportingRule;
 import org.zaproxy.zap.utils.DisplayUtils;
 
 /**

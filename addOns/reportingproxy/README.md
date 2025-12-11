@@ -1,4 +1,16 @@
-# Reporting Proxy ZAP Extension
+# Reporting Proxy & Filtering Proxy ZAP Extension
+
+This extension transforms ZAP into a passive monitoring tool (Reporting Proxy) and an active defender (Filtering Proxy). It allows developers to load custom rules to observe traffic and optionally block requests that violate those rules.
+
+## Features
+
+*   **Live Notifications**: Get immediate alerts when a rule is violated.
+*   **Active Blocking**: Configure rules to block traffic and return custom error pages.
+*   **Custom Rules**: Load your own logic via external JAR files.
+*   **Statistics**: Track how many times each rule has been triggered or blocked.
+*   **Graceful Handling**:
+    *   **API (JSON)**: Returns `429 Too Many Requests` with a JSON error message.
+    *   **Web (HTML)**: Returns a user-friendly "Request Blocked" HTML page.
 
 ## Usage
 
@@ -11,10 +23,13 @@
 3.  In ZAP, go to **File** -> **Load Add-on File...** and select the generated `.zap` file.
 
 ### Using the Panel
-Once installed, a new tab titled **"Reporting Proxy"** will appear in the bottom panel of ZAP.The table displays all currently active rules and their descriptions.
+Once installed, a new tab titled **"Reporting Proxy"** will appear in the bottom panel of ZAP. The table displays all currently active rules.
 
-*   **Load Rules**: Click the **"Load Rules JAR"** button to select a `.jar` file containing your custom rules. The default rules are also in the add-on directory as JAR files. The extension will automatically find and load any classes implementing the `ReportingRule` interface.
+*   **Load Rules**: Click the **"Load Rules JAR"** button to select a `.jar` file containing your custom rules.
+*   **Toggle Blocking**: Check the box in the **"Blocking"** column to enable active blocking for a specific rule.
+*   **View Statistics**: The **"Blocked Count"** column shows how many requests have been blocked by each rule.
 *   **Remove Rules**: Select a rule in the table and click **"Remove Rule"** to unload it.
+*   **History**: Click **"View Notification History"** to see a log of all past alerts.
 
 ## Writing Custom Rules
 
@@ -23,11 +38,13 @@ You can create your own rules to detect specific patterns or vulnerabilities.
 ### Prerequisites
 *   Java Development Kit (JDK) 11 or higher.
 *   `zap.jar` (or the ZAP core dependencies) on your classpath.
+*   `reportingproxy.jar` (this extension) on your classpath.
 
 ### Step-by-Step Guide
 
 1.  **Create a new Java project**.
 2.  **Implement the `ReportingRule` interface**. Your class must implement `org.zaproxy.addon.reportingproxy.ReportingRule`.
+    *   *Tip*: You can extend `org.zaproxy.addon.reportingproxy.AbstractReportingRule` to get free support for blocking state and statistics.
 
 ### Example Rule
 
@@ -41,10 +58,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import org.parosproxy.paros.network.HttpMessage;
+import org.zaproxy.addon.reportingproxy.AbstractReportingRule; // Use Abstract base class
 import org.zaproxy.addon.reportingproxy.NotificationService;
-import org.zaproxy.addon.reportingproxy.ReportingRule;
 
-public class RateLimitRule implements ReportingRule {
+public class RateLimitRule extends AbstractReportingRule {
 
     private static final int THRESHOLD = 10;
     private static final long TIME_WINDOW = 10000; // 10 seconds
@@ -74,6 +91,7 @@ public class RateLimitRule implements ReportingRule {
 
             // Check threshold
             if (timestamps.size() > THRESHOLD) {
+                // This call handles both notification AND blocking (if enabled)
                 NotificationService.getSingleton().notify(
                         this,
                         msg,
