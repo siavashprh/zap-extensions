@@ -38,8 +38,13 @@ import org.parosproxy.paros.network.HttpMessage;
 public class ReportingProxyController {
 
     private static final Logger LOGGER = LogManager.getLogger(ReportingProxyController.class);
-    private List<ReportingRule> rules = new CopyOnWriteArrayList<>();
-    private RuleLoader ruleLoader = new RuleLoader();
+    private final RuleManager ruleManager;
+    private final RuleLoader ruleLoader;
+
+    public ReportingProxyController() {
+        this.ruleManager = new RuleManager();
+        this.ruleLoader = new RuleLoader();
+    }
 
     /**
      * Adds a new rule to the active set.
@@ -47,13 +52,7 @@ public class ReportingProxyController {
      * @param rule The rule to add.
      */
     public void addRule(ReportingRule rule) {
-        for (ReportingRule existingRule : rules) {
-            if (existingRule.getName().equals(rule.getName())) {
-                LOGGER.warn("Rule with name '{}' already exists. Skipping addition.", rule.getName());
-                return;
-            }
-        }
-        this.rules.add(rule);
+        ruleManager.addRule(rule);
     }
 
     /**
@@ -62,14 +61,14 @@ public class ReportingProxyController {
      * @param rule The rule to remove.
      */
     public void removeRule(ReportingRule rule) {
-        this.rules.remove(rule);
+        ruleManager.removeRule(rule);
     }
 
     /**
      * Clears all active rules.
      */
     public void clearRules() {
-        this.rules.clear();
+        ruleManager.clearRules();
     }
 
     /**
@@ -90,7 +89,7 @@ public class ReportingProxyController {
      * @param msg The HTTP message to scan.
      */
     public void scan(HttpMessage msg) {
-        for (ReportingRule rule : rules) {
+        for (ReportingRule rule : ruleManager.getRules()) {
             try {
                 rule.scan(msg);
             } catch (BlockingViolationException e) {
@@ -157,6 +156,6 @@ public class ReportingProxyController {
      * @return The list of {@link ReportingRule}s.
      */
     public List<ReportingRule> getRules() {
-        return rules;
+        return ruleManager.getRules();
     }
 }
