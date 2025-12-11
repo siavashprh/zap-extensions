@@ -1,4 +1,4 @@
-package org.zaproxy.addon.reportingproxy;
+package org.zaproxy.addon.reportingproxy.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
