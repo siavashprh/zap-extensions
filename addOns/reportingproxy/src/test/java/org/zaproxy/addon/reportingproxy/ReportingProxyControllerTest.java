@@ -70,6 +70,21 @@ class ReportingProxyControllerTest {
     }
 
     @Test
+    void shouldStopScanningWhenOneRuleBlocks() throws Exception {
+        controller.addRule(mockRule1);
+        controller.addRule(mockRule2);
+        HttpMessage msg = new HttpMessage();
+
+        BlockingViolationException exception = new BlockingViolationException(mockRule1, "Blocked");
+        doThrow(exception).when(mockRule1).scan(msg);
+
+        controller.scan(msg);
+
+        verify(mockRule1).scan(msg);
+        verify(mockRule2, times(0)).scan(msg);
+    }
+
+    @Test
     void shouldNotAddDuplicateRule() {
         when(mockRule1.getName()).thenReturn("Rule1");
         when(mockRule2.getName()).thenReturn("Rule1"); // Same name
@@ -79,5 +94,54 @@ class ReportingProxyControllerTest {
 
         assertEquals(1, controller.getRules().size());
         assertTrue(controller.getRules().contains(mockRule1));
+    }
+
+    @Test
+    void shouldBlockWithJsonForJsonRequest() throws Exception {
+        controller.addRule(mockRule1);
+        HttpMessage msg = new HttpMessage();
+        msg.setRequestHeader("POST /api HTTP/1.1\r\nContent-Type: application/json\r\n\r\n");
+        
+        BlockingViolationException exception = new BlockingViolationException(mockRule1, "Blocked reason");
+        doThrow(exception).when(mockRule1).scan(msg);
+
+        controller.scan(msg);
+
+        verify(mockRule1).incrementBlockedCount();
+        assertEquals(429, msg.getResponseHeader().getStatusCode());
+        assertTrue(msg.getResponseBody().toString().contains("Blocked by Filtering Proxy"));
+    }
+
+    @Test
+    void shouldBlockWithHtmlForOtherRequest() throws Exception {
+        controller.addRule(mockRule1);
+        HttpMessage msg = new HttpMessage();
+        msg.setRequestHeader("GET /page HTTP/1.1\r\n\r\n");
+        
+        BlockingViolationException exception = new BlockingViolationException(mockRule1, "Blocked reason");
+        doThrow(exception).when(mockRule1).scan(msg);
+
+        controller.scan(msg);
+
+        verify(mockRule1).incrementBlockedCount();
+        assertEquals(200, msg.getResponseHeader().getStatusCode());
+        assertTrue(msg.getResponseBody().toString().contains("Request Blocked")); 
+        assertTrue(msg.getResponseBody().toString().contains("Blocked reason"));
+    }
+
+    @Test
+    void shouldBlockWithHtmlForXmlRequest() throws Exception {
+        controller.addRule(mockRule1);
+        HttpMessage msg = new HttpMessage();
+        msg.setRequestHeader("POST /api HTTP/1.1\r\nContent-Type: application/xml\r\n\r\n");
+        
+        BlockingViolationException exception = new BlockingViolationException(mockRule1, "XML Blocked");
+        doThrow(exception).when(mockRule1).scan(msg);
+
+        controller.scan(msg);
+
+        verify(mockRule1).incrementBlockedCount();
+        assertEquals(200, msg.getResponseHeader().getStatusCode());
+        assertTrue(msg.getResponseBody().toString().contains("Request Blocked"));
     }
 }

@@ -2,6 +2,7 @@ package org.zaproxy.addon.reportingproxy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -55,5 +56,18 @@ class NotificationServiceTest {
         HttpMessage msg = new HttpMessage();
 
         service.notify(mockRule, msg, "Details");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRuleIsBlocking() {
+        ReportingRule mockRule = mock(ReportingRule.class);
+        when(mockRule.getName()).thenReturn("BlockingRule");
+        when(mockRule.isBlocking()).thenReturn(true);
+
+        HttpMessage msg = new HttpMessage();
+
+        assertThrows(BlockingViolationException.class, () -> {
+            service.notify(mockRule, msg, "Blocked!");
+        });
     }
 }
