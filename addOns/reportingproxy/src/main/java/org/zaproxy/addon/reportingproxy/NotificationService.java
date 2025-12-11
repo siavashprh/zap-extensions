@@ -36,21 +36,16 @@ public class NotificationService {
 
     /** The logger for the notification service. */
     private static final Logger LOGGER = LogManager.getLogger(NotificationService.class);
-    /** The singleton instance of the notification service. */
-    private static NotificationService instance;
-
-    private NotificationService() {}
+    
+    private final NotificationManager notificationManager;
 
     /**
-     * Gets the singleton instance of the notification service.
+     * Constructs a new NotificationService.
      * 
-     * @return The singleton instance of the notification service.
+     * @param notificationManager The notification manager to use for displaying alerts.
      */
-    public static synchronized NotificationService getSingleton() {
-        if (instance == null) {
-            instance = new NotificationService();
-        }
-        return instance;
+    public NotificationService(NotificationManager notificationManager) {
+        this.notificationManager = notificationManager;
     }
 
     /**
@@ -74,7 +69,6 @@ public class NotificationService {
         }
         
         if (View.isInitialised()) {
-            NotificationManager notificationManager = NotificationManager.getInstance();
             String displayDetails = details;
             if (rule.isBlocking()) {
                 displayDetails = "[BLOCKED] " + details;

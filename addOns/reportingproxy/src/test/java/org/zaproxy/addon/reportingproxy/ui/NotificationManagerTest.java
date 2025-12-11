@@ -1,7 +1,6 @@
 package org.zaproxy.addon.reportingproxy.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,15 +12,8 @@ class NotificationManagerTest {
 
     @BeforeEach
     void setUp() {
-        manager = NotificationManager.getInstance();
+        manager = new NotificationManager();
         manager.clearHistory();
-    }
-
-    @Test
-    void shouldReturnSameInstance() {
-        NotificationManager instance1 = NotificationManager.getInstance();
-        NotificationManager instance2 = NotificationManager.getInstance();
-        assertSame(instance1, instance2);
     }
 
     @Test

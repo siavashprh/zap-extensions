@@ -1,7 +1,5 @@
 package org.zaproxy.addon.reportingproxy;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -18,16 +16,8 @@ class NotificationServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = NotificationService.getSingleton();
-        manager = NotificationManager.getInstance();
-        manager.clearHistory();
-    }
-
-    @Test
-    void shouldReturnSameInstance() {
-        NotificationService instance1 = NotificationService.getSingleton();
-        NotificationService instance2 = NotificationService.getSingleton();
-        assertSame(instance1, instance2);
+        manager = new NotificationManager();
+        service = new NotificationService(manager);
     }
 
     @Test

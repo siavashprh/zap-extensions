@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
+import org.zaproxy.addon.reportingproxy.ui.NotificationManager;
 import org.zaproxy.addon.reportingproxy.ui.ReportingProxyPanel;
 
 /**
@@ -45,6 +46,10 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
     private ReportingProxyListener listener;
     /** The panel for the extension within ZAP UI */
     private ReportingProxyPanel panel;
+    /** The notification manager for the extension. */
+    private NotificationManager notificationManager;
+    /** The notification service for the extension. */
+    private NotificationService notificationService;
     /** Logger for this class. */
     private static final Logger LOGGER = LogManager.getLogger(ExtensionReportingProxy.class);
 
@@ -63,7 +68,10 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
     public void hook(ExtensionHook extensionHook) {
         super.hook(extensionHook);
         
-        controller = new ReportingProxyController();
+        notificationManager = new NotificationManager();
+        notificationService = new NotificationService(notificationManager);
+        
+        controller = new ReportingProxyController(notificationService);
         listener = new ReportingProxyListener(controller);
         
         extensionHook.addHttpSenderListener(listener);
@@ -95,7 +103,7 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
      */
     private ReportingProxyPanel getReportingProxyPanel() {
         if (panel == null) {
-            panel = new ReportingProxyPanel(this);
+            panel = new ReportingProxyPanel(this, notificationManager);
         }
         return panel;
     }

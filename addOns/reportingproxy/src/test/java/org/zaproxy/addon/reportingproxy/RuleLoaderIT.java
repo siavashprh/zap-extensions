@@ -49,7 +49,7 @@ class RuleLoaderIT {
         String source = "package org.zaproxy.addon.reportingproxy.generated;\n" +
                 "import org.zaproxy.addon.reportingproxy.ReportingRule;\n" +
                 "import org.parosproxy.paros.network.HttpMessage;\n" +
-                "public class GeneratedRule implements ReportingRule {\n" +
+                "public class GeneratedRule extends ReportingRule {\n" +
                 "    @Override public void scan(HttpMessage msg) {}\n" +
                 "    @Override public String getName() { return \"Generated Rule\"; }\n" +
                 "    @Override public String getDescription() { return \"Generated\"; }\n" +

@@ -28,7 +28,6 @@ import java.util.Set;
 import org.parosproxy.paros.network.HttpHeader;
 import org.parosproxy.paros.network.HttpHeaderField;
 import org.parosproxy.paros.network.HttpMessage;
-import org.zaproxy.addon.reportingproxy.AbstractReportingRule;
 import org.zaproxy.addon.reportingproxy.NotificationService;
 import org.zaproxy.addon.reportingproxy.ReportingRule;
 
@@ -37,7 +36,7 @@ import org.zaproxy.addon.reportingproxy.ReportingRule;
  * 
  * @param msg The HTTP message to scan.
  */
-public class HeaderAnalysisRule extends AbstractReportingRule {
+public class HeaderAnalysisRule extends ReportingRule {
 
     private static final int HISTORY_SIZE = 5;
     // Domain -> List of Header Sets (newest last)
@@ -79,7 +78,9 @@ public class HeaderAnalysisRule extends AbstractReportingRule {
     }
 
     protected void notifyViolation(HttpMessage msg, String details) {
-        NotificationService.getSingleton().notify(this, msg, details);
+        if (getNotificationService() != null) {
+            getNotificationService().notify(this, msg, details);
+        }
     }
 
     private Set<String> getHeaderNames(HttpHeader header) {

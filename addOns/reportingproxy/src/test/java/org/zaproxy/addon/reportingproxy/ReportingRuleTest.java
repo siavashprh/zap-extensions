@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.parosproxy.paros.network.HttpMessage;
 
-class AbstractReportingRuleTest {
+class ReportingRuleTest {
 
     private TestReportingRule rule;
 
@@ -32,7 +32,7 @@ class AbstractReportingRuleTest {
     }
 
     @Test
-    void shouldIncrementBlockedCount() {
+    void shouldTrackBlockedCount() {
         assertEquals(0, rule.getBlockedCount());
         
         rule.incrementBlockedCount();
@@ -42,7 +42,7 @@ class AbstractReportingRuleTest {
         assertEquals(2, rule.getBlockedCount());
     }
 
-    private static class TestReportingRule extends AbstractReportingRule {
+    private static class TestReportingRule extends ReportingRule {
         @Override
         public void scan(HttpMessage msg) {
             // No-op

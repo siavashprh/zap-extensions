@@ -3,7 +3,7 @@
  *
  * ZAP is an HTTP/HTTPS proxy for assessing web application security.
  *
- * Copyright 2024 The ZAP Development Team
+ * Copyright 2025 The ZAP Development Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,39 +22,56 @@ package org.zaproxy.addon.reportingproxy;
 import org.parosproxy.paros.network.HttpMessage;
 
 /**
- * Interface for a reporting rule. Rules can be stateless (checking a single message) or stateful
- * (maintaining history).
+ * Abstract base class for reporting rules.
+ * Handles the state for blocking configuration and statistics.
  */
-public interface ReportingRule {
+public abstract class ReportingRule {
+
+    private boolean blocking = false;
+    private int blockedCount = 0;
+    private NotificationService notificationService;
 
     /**
      * Scans the given message and triggers a notification if the rule is violated.
      *
      * @param msg The HTTP message to scan.
      */
-    void scan(HttpMessage msg);
+    public abstract void scan(HttpMessage msg);
 
     /**
      * Gets the name of the rule.
      *
      * @return The name of the rule.
      */
-    String getName();
+    public abstract String getName();
 
     /**
      * Gets the description of the rule.
      *
      * @return The description of the rule.
      */
-    String getDescription();
+    public abstract String getDescription();
+
+    /**
+     * Sets the notification service to be used by the rule.
+     * 
+     * @param service The notification service.
+     */
+    public void setNotificationService(NotificationService service) {
+        this.notificationService = service;
+    }
+    
+    protected NotificationService getNotificationService() {
+        return notificationService;
+    }
 
     /**
      * Checks if the rule is currently set to blocking mode.
      *
      * @return true if the rule is blocking, false otherwise.
      */
-    default boolean isBlocking() {
-        return false;
+    public boolean isBlocking() {
+        return blocking;
     }
 
     /**
@@ -62,8 +79,8 @@ public interface ReportingRule {
      *
      * @param blocking true to enable blocking, false to disable.
      */
-    default void setBlocking(boolean blocking) {
-        // Default implementation does nothing
+    public void setBlocking(boolean blocking) {
+        this.blocking = blocking;
     }
 
     /**
@@ -71,14 +88,14 @@ public interface ReportingRule {
      *
      * @return The number of blocked requests.
      */
-    default int getBlockedCount() {
-        return 0;
+    public int getBlockedCount() {
+        return blockedCount;
     }
 
     /**
      * Increments the blocked count.
      */
-    default void incrementBlockedCount() {
-        // Default implementation does nothing
+    public void incrementBlockedCount() {
+        this.blockedCount++;
     }
 }

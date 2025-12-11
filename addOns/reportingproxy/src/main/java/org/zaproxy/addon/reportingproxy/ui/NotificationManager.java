@@ -37,29 +37,17 @@ public class NotificationManager {
     private static final int MAX_VISIBLE_NOTIFICATIONS = 5;
     private static final int CORNER_MARGIN = 20;
     
-    private static NotificationManager instance;
     private final List<NotificationWindow> activeNotifications;
     private final List<NotificationHistoryEntry> notificationHistory;
     
     /**
-     * Private constructor for singleton pattern.
+     * Constructs a new NotificationManager.
      */
-    private NotificationManager() {
+    public NotificationManager() {
         activeNotifications = new ArrayList<>();
         notificationHistory = new ArrayList<>();
     }
-    
-    /**
-     * Gets the singleton instance of the NotificationManager.
-     * 
-     * @return The singleton instance.
-     */
-    public static synchronized NotificationManager getInstance() {
-        if (instance == null) {
-            instance = new NotificationManager();
-        }
-        return instance;
-    }
+
     
     /**
      * Shows a notification window for a rule violation.

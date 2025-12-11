@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import org.parosproxy.paros.network.HttpMessage;
-import org.zaproxy.addon.reportingproxy.AbstractReportingRule;
 import org.zaproxy.addon.reportingproxy.NotificationService;
 import org.zaproxy.addon.reportingproxy.ReportingRule;
 
@@ -33,7 +32,7 @@ import org.zaproxy.addon.reportingproxy.ReportingRule;
  * 
  * @param msg The HTTP message to scan.
  */
-public class RateLimitRule extends AbstractReportingRule {
+public class RateLimitRule extends ReportingRule {
 
     private static final int THRESHOLD = 10;
     private static final long TIME_WINDOW = 10000; // 10 seconds
@@ -77,7 +76,9 @@ public class RateLimitRule extends AbstractReportingRule {
     }
 
     protected void notifyViolation(HttpMessage msg, String details) {
-        NotificationService.getSingleton().notify(this, msg, details);
+        if (getNotificationService() != null) {
+            getNotificationService().notify(this, msg, details);
+        }
     }
 
     protected long getCurrentTime() {

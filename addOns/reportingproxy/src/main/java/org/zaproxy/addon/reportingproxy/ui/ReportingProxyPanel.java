@@ -55,6 +55,7 @@ public class ReportingProxyPanel extends AbstractPanel {
     private static final Logger LOGGER = LogManager.getLogger(ReportingProxyPanel.class);
 
     private transient ExtensionReportingProxy extension;
+    private transient NotificationManager notificationManager;
     private JLabel statusLabel;
     private JTable rulesTable;
     private DefaultTableModel tableModel;
@@ -63,10 +64,12 @@ public class ReportingProxyPanel extends AbstractPanel {
      * Constructs a new ReportingProxyPanel.
      * 
      * @param extension The extension that owns this panel.
+     * @param notificationManager The notification manager.
      */
-    public ReportingProxyPanel(ExtensionReportingProxy extension) {
+    public ReportingProxyPanel(ExtensionReportingProxy extension, NotificationManager notificationManager) {
         super();
         this.extension = extension;
+        this.notificationManager = notificationManager;
         this.setLayout(new BorderLayout());
         this.setName("Reporting Proxy");
         this.setIcon(DisplayUtils.getScaledIcon(ReportingProxyPanel.class.getResource("/org/zaproxy/addon/reportingproxy/resources/icon.png")));
@@ -109,10 +112,9 @@ public class ReportingProxyPanel extends AbstractPanel {
         historyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                NotificationManager manager = NotificationManager.getInstance();
                 NotificationHistoryDialog dialog = new NotificationHistoryDialog(
                     View.getSingleton().getMainFrame(), 
-                    manager
+                    notificationManager
                 );
                 dialog.setVisible(true);
             }

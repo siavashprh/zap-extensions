@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 import org.parosproxy.paros.network.HttpHeader;
 import org.parosproxy.paros.network.HttpMessage;
-import org.zaproxy.addon.reportingproxy.AbstractReportingRule;
 import org.zaproxy.addon.reportingproxy.NotificationService;
 import org.zaproxy.addon.reportingproxy.ReportingRule;
 
@@ -36,7 +35,7 @@ import org.zaproxy.addon.reportingproxy.ReportingRule;
  * 
  * @param msg The HTTP message to scan.
  */
-public class CookieSyncRule extends AbstractReportingRule {
+public class CookieSyncRule extends ReportingRule {
 
     // Thread-safe set to store unique cookie values
     private final Set<String> trackedCookies = Collections.synchronizedSet(new HashSet<>());
@@ -93,7 +92,9 @@ public class CookieSyncRule extends AbstractReportingRule {
     }
 
     protected void notifyViolation(HttpMessage msg, String details) {
-        NotificationService.getSingleton().notify(this, msg, details);
+        if (getNotificationService() != null) {
+            getNotificationService().notify(this, msg, details);
+        }
     }
 
     @Override

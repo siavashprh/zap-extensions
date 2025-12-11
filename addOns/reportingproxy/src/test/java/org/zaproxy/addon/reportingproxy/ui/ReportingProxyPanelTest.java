@@ -20,6 +20,7 @@ class ReportingProxyPanelTest {
     private ExtensionReportingProxy mockExtension;
     private ReportingProxyController mockController;
     private ReportingRule mockRule;
+    private NotificationManager mockNotificationManager;
     private ReportingProxyPanel panel;
 
     @BeforeEach
@@ -27,6 +28,7 @@ class ReportingProxyPanelTest {
         mockExtension = mock(ExtensionReportingProxy.class);
         mockController = mock(ReportingProxyController.class);
         mockRule = mock(ReportingRule.class);
+        mockNotificationManager = mock(NotificationManager.class);
 
         when(mockExtension.getController()).thenReturn(mockController);
         when(mockController.getRules()).thenReturn(List.of(mockRule));
@@ -40,7 +42,7 @@ class ReportingProxyPanelTest {
     @Test
     void shouldInitializeTableWithRules() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            panel = new ReportingProxyPanel(mockExtension);
+            panel = new ReportingProxyPanel(mockExtension, mockNotificationManager);
         });
         
         SwingUtilities.invokeAndWait(() -> {});
@@ -56,7 +58,7 @@ class ReportingProxyPanelTest {
     @Test
     void shouldUpdateRuleWhenBlockingToggled() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            panel = new ReportingProxyPanel(mockExtension);
+            panel = new ReportingProxyPanel(mockExtension, mockNotificationManager);
         });
         SwingUtilities.invokeAndWait(() -> {});
 

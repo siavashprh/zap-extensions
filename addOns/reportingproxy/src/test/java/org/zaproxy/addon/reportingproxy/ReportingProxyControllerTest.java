@@ -17,10 +17,12 @@ class ReportingProxyControllerTest {
     private ReportingProxyController controller;
     private ReportingRule mockRule1;
     private ReportingRule mockRule2;
+    private NotificationService mockNotificationService;
 
     @BeforeEach
     void setUp() {
-        controller = new ReportingProxyController();
+        mockNotificationService = mock(NotificationService.class);
+        controller = new ReportingProxyController(mockNotificationService);
         mockRule1 = mock(ReportingRule.class);
         mockRule2 = mock(ReportingRule.class);
         

@@ -40,10 +40,12 @@ public class ReportingProxyController {
     private static final Logger LOGGER = LogManager.getLogger(ReportingProxyController.class);
     private final RuleManager ruleManager;
     private final RuleLoader ruleLoader;
+    private final NotificationService notificationService;
 
-    public ReportingProxyController() {
+    public ReportingProxyController(NotificationService notificationService) {
         this.ruleManager = new RuleManager();
         this.ruleLoader = new RuleLoader();
+        this.notificationService = notificationService;
     }
 
     /**
@@ -52,6 +54,7 @@ public class ReportingProxyController {
      * @param rule The rule to add.
      */
     public void addRule(ReportingRule rule) {
+        rule.setNotificationService(notificationService);
         ruleManager.addRule(rule);
     }
 
