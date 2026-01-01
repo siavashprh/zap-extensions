@@ -21,6 +21,7 @@ package org.zaproxy.addon.reportingproxy;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -28,42 +29,31 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Loads rules from a JAR file.
- * 
- * @param jarFile The JAR file to load rules from.
- * @return A list of rules loaded from the JAR file.
- * @throws IOException If an I/O error occurs.
- * @throws ClassNotFoundException If a class cannot be found.
- * @throws InstantiationException If an instance cannot be created.
- * @throws IllegalAccessException If an instance cannot be accessed.
  */
 public class RuleLoader {
 
-    @SuppressWarnings("deprecation")
+    private static final Logger LOGGER = LogManager.getLogger(RuleLoader.class);
+
     /**
      * Loads rules from a JAR file.
      * 
      * @param jarFile The JAR file to load rules from.
      * @return A list of rules loaded from the JAR file.
      * @throws IOException If an I/O error occurs.
-     * @throws ClassNotFoundException If a class cannot be found.
-     * @throws InstantiationException If an instance cannot be created.
-     * @throws IllegalAccessException If an instance cannot be accessed.
      */
-    public List<ReportingRule> loadRules(File jarFile)
-            throws IOException,
-                    ClassNotFoundException,
-                    InstantiationException,
-                    IllegalAccessException {
+    public List<ReportingRule> loadRules(File jarFile) throws IOException {
         List<ReportingRule> rules = new ArrayList<>();
 
         if (!jarFile.exists() || !jarFile.getName().endsWith(".jar")) {
             throw new IOException("Invalid JAR file: " + jarFile.getAbsolutePath());
         }
 
-        URL[] urls = {new URL("jar:file:" + jarFile.getAbsolutePath() + "!/")};
+        URL[] urls = {jarFile.toURI().toURL()};
         try (URLClassLoader cl =
                 URLClassLoader.newInstance(urls, this.getClass().getClassLoader())) {
             try (JarFile jar = new JarFile(jarFile)) {
@@ -82,12 +72,17 @@ public class RuleLoader {
 
                     try {
                         Class<?> c = cl.loadClass(className);
-                        if (ReportingRule.class.isAssignableFrom(c) && !c.isInterface()) {
-                            ReportingRule rule = (ReportingRule) c.newInstance();
+                        if (ReportingRule.class.isAssignableFrom(c)
+                                && !c.isInterface()
+                                && !Modifier.isAbstract(c.getModifiers())) {
+                            ReportingRule rule =
+                                    (ReportingRule) c.getDeclaredConstructor().newInstance();
                             rules.add(rule);
                         }
                     } catch (NoClassDefFoundError | ClassNotFoundException e) {
                         // Ignore classes that cannot be loaded or are not relevant
+                    } catch (Throwable e) {
+                        LOGGER.error("Failed to load rule class: {}", className, e);
                     }
                 }
             }

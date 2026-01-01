@@ -1,9 +1,11 @@
 package org.zaproxy.addon.reportingproxy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,20 +24,50 @@ class ReportingProxyListenerTest {
 
     @Test
     void shouldHaveCorrectListenerOrder() {
-        assertEquals(9000, listener.getListenerOrder());
+        assertEquals(9000, listener.getArrangeableListenerOrder());
     }
 
     @Test
     void shouldDelegateOnHttpRequestSend() {
         HttpMessage msg = new HttpMessage();
-        listener.onHttpRequestSend(msg, 0, null);
+        when(mockController.scan(msg)).thenReturn(true);
+        
+        boolean result = listener.onHttpRequestSend(msg);
+        
         verify(mockController, times(1)).scan(msg);
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnTrueWhenBlockedOnRequest() {
+        HttpMessage msg = new HttpMessage();
+        when(mockController.scan(msg)).thenReturn(false);
+        
+        boolean result = listener.onHttpRequestSend(msg);
+        
+        verify(mockController, times(1)).scan(msg);
+        assertTrue(result);
     }
 
     @Test
     void shouldDelegateOnHttpResponseReceive() {
         HttpMessage msg = new HttpMessage();
-        listener.onHttpResponseReceive(msg, 0, null);
+        when(mockController.scan(msg)).thenReturn(true);
+        
+        boolean result = listener.onHttpResponseReceive(msg);
+        
         verify(mockController, times(1)).scan(msg);
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnTrueWhenBlockedOnResponse() {
+        HttpMessage msg = new HttpMessage();
+        when(mockController.scan(msg)).thenReturn(false);
+        
+        boolean result = listener.onHttpResponseReceive(msg);
+        
+        verify(mockController, times(1)).scan(msg);
+        assertTrue(result);
     }
 }

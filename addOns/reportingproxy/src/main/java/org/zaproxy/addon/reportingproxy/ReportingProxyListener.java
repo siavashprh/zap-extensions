@@ -19,9 +19,8 @@
  */
 package org.zaproxy.addon.reportingproxy;
 
+import org.parosproxy.paros.core.proxy.ProxyListener;
 import org.parosproxy.paros.network.HttpMessage;
-import org.parosproxy.paros.network.HttpSender;
-import org.zaproxy.zap.network.HttpSenderListener;
 
 /**
  * Listens to all HTTP requests and responses passing through ZAP.
@@ -29,7 +28,7 @@ import org.zaproxy.zap.network.HttpSenderListener;
  * Intercepting traffic and forwarding it to the {@link ReportingProxyController} for analysis.
  * It is registered with a high listener order to ensure it sees traffic after other modifications.
  */
-public class ReportingProxyListener implements HttpSenderListener {
+public class ReportingProxyListener implements ProxyListener {
 
     private ReportingProxyController controller;
 
@@ -46,27 +45,27 @@ public class ReportingProxyListener implements HttpSenderListener {
      * @return the listener order.
      */
     @Override
-    public int getListenerOrder() {
+    public int getArrangeableListenerOrder() {
         return 9000;
     }
 
     /**
      * @param msg The HTTP message to scan.
-     * @param initiator The initiator of the message.
-     * @param helper The helper to use for sending the message.
+     * @return true if the message should be forwarded, false if it was blocked.
      */
     @Override
-    public void onHttpRequestSend(HttpMessage msg, int initiator, HttpSender helper) {
+    public boolean onHttpRequestSend(HttpMessage msg) {
         controller.scan(msg);
+        return true;
     }
 
     /**
      * @param msg The HTTP message to scan.
-     * @param initiator The initiator of the message.
-     * @param helper The helper to use for sending the message.
+     * @return true if the message should be forwarded, false if it was blocked.
      */
     @Override
-    public void onHttpResponseReceive(HttpMessage msg, int initiator, HttpSender helper) {
+    public boolean onHttpResponseReceive(HttpMessage msg) {
         controller.scan(msg);
+        return true;
     }
 }

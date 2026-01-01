@@ -90,19 +90,21 @@ public class ReportingProxyController {
      * next rule.
      *
      * @param msg The HTTP message to scan.
+     * @return true if the message should be forwarded, false if it was blocked.
      */
-    public void scan(HttpMessage msg) {
+    public boolean scan(HttpMessage msg) {
         for (ReportingRule rule : ruleManager.getRules()) {
             try {
                 rule.scan(msg);
             } catch (BlockingViolationException e) {
                 LOGGER.info("Blocking violation detected: {}", e.getDetails());
                 handleBlocking(msg, e);
-                break;
+                return false;
             } catch (Exception e) {
                 LOGGER.error("Error scanning message with rule {}: {}", rule.getName(), e.getMessage(), e);
             }
         }
+        return true;
     }
 
     private void handleBlocking(HttpMessage msg, BlockingViolationException e) {

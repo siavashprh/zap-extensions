@@ -74,7 +74,7 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
         controller = new ReportingProxyController(notificationService);
         listener = new ReportingProxyListener(controller);
         
-        extensionHook.addHttpSenderListener(listener);
+        extensionHook.addProxyListener(listener);
 
         loadDefaultRulesFromJars();
 
@@ -146,7 +146,7 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
                         LOGGER.warn("Rule JAR file not found: {}", jarPath);
                     }
                 } catch (Exception e) {
-                    LOGGER.error("Error loading rules from JAR file {}: {}", file, e.getMessage(), e);
+                    LOGGER.error("Error loading rules from JAR file {}", file, e);
                 }
             }
         }
@@ -170,7 +170,7 @@ public class ExtensionReportingProxy extends ExtensionAdaptor {
             controller.addRule(new org.zaproxy.addon.reportingproxy.rules.CspDetectionRule());
             LOGGER.debug("Loaded default rules directly");
         } catch (Exception e) {
-            LOGGER.error("Error loading default rules directly: {}", e.getMessage(), e);
+            LOGGER.error("Error loading default rules directly", e);
         }
     }
 }
